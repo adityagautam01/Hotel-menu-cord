@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1639,65 +1638,65 @@
 
 
     
-    function sendSMS() {
-      syncCustomerInfoFromModal();
-      const customerName = document.getElementById('customerNameModal').value;
-      const tableNumber = document.getElementById('tableNumberModal').value;
+    // function sendSMS() {
+    //   syncCustomerInfoFromModal();
+    //   const customerName = document.getElementById('customerNameModal').value;
+    //   const tableNumber = document.getElementById('tableNumberModal').value;
 
-      if (!customerName || !tableNumber) {
-        showStatusMessage('Please fill in all customer details!', true);
-        return;
-      }
+    //   if (!customerName || !tableNumber) {
+    //     showStatusMessage('Please fill in all customer details!', true);
+    //     return;
+    //   }
 
-      if (Object.keys(cart).length === 0) {
-        showStatusMessage('Cart is empty! Please add items first.', true);
-        return;
-      }
+    //   if (Object.keys(cart).length === 0) {
+    //     showStatusMessage('Cart is empty! Please add items first.', true);
+    //     return;
+    //   }
 
-      // Prepare order items for storage
-      const orderItems = [];
-      for (let item in cart) {
-        orderItems.push({
-          name: item,
-          quantity: cart[item].quantity,
-          price: cart[item].price,
-          total: cart[item].price * cart[item].quantity
-        });
-      }
+    //   // Prepare order items for storage
+    //   const orderItems = [];
+    //   for (let item in cart) {
+    //     orderItems.push({
+    //       name: item,
+    //       quantity: cart[item].quantity,
+    //       price: cart[item].price,
+    //       total: cart[item].price * cart[item].quantity
+    //     });
+    //   }
 
-      // Add to order history
-      addOrderToHistory(customerName, tableNumber, orderItems, total);
+    //   // Add to order history
+    //   addOrderToHistory(customerName, tableNumber, orderItems, total);
 
-      let message = `New Order from 🍽️ MR.T Cafe\n\n`;
-      message += `Customer: ${customerName}\n`;
-      message += `Table: ${tableNumber}\n`;
-      message += `Date: ${new Date().toLocaleDateString('en-GB')}\n`;
-      message += `Time: ${new Date().toLocaleTimeString()}\n\n`;
-      message += `Order Details:\n`;
-      message += `─────────────\n`;
+    //   let message = `New Order from 🍽️ MR.T Cafe\n\n`;
+    //   message += `Customer: ${customerName}\n`;
+    //   message += `Table: ${tableNumber}\n`;
+    //   message += `Date: ${new Date().toLocaleDateString('en-GB')}\n`;
+    //   message += `Time: ${new Date().toLocaleTimeString()}\n\n`;
+    //   message += `Order Details:\n`;
+    //   message += `─────────────\n`;
 
-      for (let item in cart) {
-        const itemTotal = cart[item].price * cart[item].quantity;
-        message += `${item}\n`;
-        message += `₹${cart[item].price} × ${cart[item].quantity} = ₹${itemTotal}\n\n`;
-      }
+    //   for (let item in cart) {
+    //     const itemTotal = cart[item].price * cart[item].quantity;
+    //     message += `${item}\n`;
+    //     message += `₹${cart[item].price} × ${cart[item].quantity} = ₹${itemTotal}\n\n`;
+    //   }
 
-      message += `─────────────\n`;
-      message += `Total Amount: ₹${total}`;
+    //   message += `─────────────\n`;
+    //   message += `Total Amount: ₹${total}`;
 
-      // const smsLink = `sms:${HOTEL_PHONE}?body=${encodeURIComponent(message)}`;
-      // window.location.href = smsLink;
+    //   // const smsLink = `sms:${HOTEL_PHONE}?body=${encodeURIComponent(message)}`;
+    //   // window.location.href = smsLink;
       
-      showStatusMessage('✅ Order sent successfully!');
+    //   showStatusMessage('✅ Order sent successfully!');
       
-      // Clear cart after sending
-      setTimeout(() => {
-        cart = {};
-        total = 0;
-        updateCartDisplay();
-        toggleCart();
-      }, 1500);
-    }
+    //   // Clear cart after sending
+    //   setTimeout(() => {
+    //     cart = {};
+    //     total = 0;
+    //     updateCartDisplay();
+    //     toggleCart();
+    //   }, 1500);
+    // }
 
     function downloadPDF() {
       syncCustomerInfoFromModal();
