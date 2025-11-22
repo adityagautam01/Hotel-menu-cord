@@ -943,6 +943,7 @@
         <div class="customer-info-modal">
           <label>Customer Name:</label>
           <input type="text" id="customerNameModal" placeholder="Enter Name">
+          
           <label>Table Number:</label>
           <input type="number" id="tableNumberModal" placeholder="Enter Table Number">
         </div>
@@ -954,6 +955,7 @@
             <p style="font-size: 0.9rem; margin-top: 5px;">Add items to get started!</p>
           </div>
         </div>
+
         <div class="cart-total" id="cartTotal">Total: ₹0</div>
 
         <div class="action-buttons">
@@ -1635,68 +1637,71 @@
       }, 5000);
     }
 
+    // index.html mein sendSMS() function ko isse replace karein
 
+function sendSMS() {
+    syncCustomerInfoFromModal();
+    const customerName = document.getElementById('customerNameModal').value.trim();
+    const tableNumber = document.getElementById('tableNumberModal').value.trim();
 
+    if (!customerName || !tableNumber || Object.keys(cart).length === 0) {
+        showStatusMessage('Please fill all details and add items to cart!', true);
+        return;
+    }
+
+    // 1. Prepare data for API
+    const orderItems = Object.keys(cart).map(item => ({
+        name: item,
+        quantity: cart[item].quantity,
+        price: cart[item].price,
+        total: cart[item].price * cart[item].quantity
+    }));
+
+    const newOrderData = {
+        customerName: customerName,
+        tableNumber: tableNumber,
+        items: orderItems,
+        total: total,
+        confirmed: false, // Hamesha false rahega naye order ke liye
+        date: new Date().toLocaleDateString('en-GB'),
+        time: new Date().toLocaleTimeString(),
+        timestamp: Date.now()
+    };
     
-    // function sendSMS() {
-    //   syncCustomerInfoFromModal();
-    //   const customerName = document.getElementById('customerNameModal').value;
-    //   const tableNumber = document.getElementById('tableNumberModal').value;
+    // 2. API Call to place the order (Yahan Local Storage hata denge)
+    fetch('http://localhost:3000/api/orders', { 
+    method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newOrderData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Server error while placing order.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Success
+        showStatusMessage('✅ Order Placed Successfully! (Order ID: ' + data.orderNumber + ')');
+        
+        // Cart ko khali karein
+        cart = {};
+        total = 0;
+        updateCartDisplay();
+        toggleCart();
 
-    //   if (!customerName || !tableNumber) {
-    //     showStatusMessage('Please fill in all customer details!', true);
-    //     return;
-    //   }
+        // Agar aap chahte hain ki yeh order Local Storage mein bhi save ho customer ko dikhane ke liye, toh neeche ki lines use kar sakte hain.
+        // addOrderToHistory(customerName, tableNumber, orderItems, total); // Agar history Local Storage mein rakhni hai
+    })
+    .catch(error => {
+        console.error('Order Error:', error);
+        showStatusMessage('❌ Order failed: ' + error.message, true);
+    });
+}
 
-    //   if (Object.keys(cart).length === 0) {
-    //     showStatusMessage('Cart is empty! Please add items first.', true);
-    //     return;
-    //   }
-
-    //   // Prepare order items for storage
-    //   const orderItems = [];
-    //   for (let item in cart) {
-    //     orderItems.push({
-    //       name: item,
-    //       quantity: cart[item].quantity,
-    //       price: cart[item].price,
-    //       total: cart[item].price * cart[item].quantity
-    //     });
-    //   }
-
-    //   // Add to order history
-    //   addOrderToHistory(customerName, tableNumber, orderItems, total);
-
-    //   let message = `New Order from 🍽️ MR.T Cafe\n\n`;
-    //   message += `Customer: ${customerName}\n`;
-    //   message += `Table: ${tableNumber}\n`;
-    //   message += `Date: ${new Date().toLocaleDateString('en-GB')}\n`;
-    //   message += `Time: ${new Date().toLocaleTimeString()}\n\n`;
-    //   message += `Order Details:\n`;
-    //   message += `─────────────\n`;
-
-    //   for (let item in cart) {
-    //     const itemTotal = cart[item].price * cart[item].quantity;
-    //     message += `${item}\n`;
-    //     message += `₹${cart[item].price} × ${cart[item].quantity} = ₹${itemTotal}\n\n`;
-    //   }
-
-    //   message += `─────────────\n`;
-    //   message += `Total Amount: ₹${total}`;
-
-    //   // const smsLink = `sms:${HOTEL_PHONE}?body=${encodeURIComponent(message)}`;
-    //   // window.location.href = smsLink;
-      
-    //   showStatusMessage('✅ Order sent successfully!');
-      
-    //   // Clear cart after sending
-    //   setTimeout(() => {
-    //     cart = {};
-    //     total = 0;
-    //     updateCartDisplay();
-    //     toggleCart();
-    //   }, 1500);
-    // }
+// NOTE: addOrderToHistory, loadOrders, saveOrders ki zaroorat sirf tab hai jab aap customer side par purane orders dikhana chahte hain. Warna, unhein 'index.html' se remove kar sakte hain.
 
     function downloadPDF() {
       syncCustomerInfoFromModal();
@@ -1763,333 +1768,6 @@
         toggleCart();
       }
     });
-
-   
-    
-    // =========================================================
-    // INITIALIZATION & STORAGE FUNCTIONS
-    // =========================================================
-
-    // Load orders from storage
-    function loadOrders() {
-        const stored = localStorage.getItem('mrtCafeOrders');
-        if (stored) {
-            try {
-                const data = JSON.parse(stored);
-                allOrders = data.orders || [];
-                orderCounter = data.counter || 1;
-                updateOrderBadge();
-            } catch (e) {
-                allOrders = [];
-                orderCounter = 1;
-            }
-        }
-    }
-
-    // Save orders to storage (This is the CORE LINKING part)
-    function saveOrders() {
-        localStorage.setItem('mrtCafeOrders', JSON.stringify({
-            orders: allOrders,
-            counter: orderCounter
-        }));
-        updateOrderBadge();
-    }
-
-    // Add order to history
-    function addOrderToHistory(customerName, tableNumber, cartItems, totalAmount) {
-        const order = {
-            orderNumber: orderCounter++,
-            customerName: customerName,
-            tableNumber: tableNumber,
-            items: cartItems,
-            total: totalAmount,
-            date: new Date().toLocaleDateString('en-GB'),
-            time: new Date().toLocaleTimeString(),
-            timestamp: Date.now(),
-            confirmed: false // Naya order hamesha 'pending' hoga
-        };
-        allOrders.push(order);
-        saveOrders();
-    }
-
-    // =========================================================
-    // UI & HELPER FUNCTIONS
-    // =========================================================
-
-    function playSound() {
-        // Simple sound simulation if needed
-    }
-
-    function updateOrderBadge() {
-        const badge = document.getElementById('orderBadge');
-        if (badge) {
-            badge.textContent = allOrders.length;
-        }
-    }
-
-    function syncCustomerInfo() {
-        const name = document.getElementById('customerName').value;
-        const table = document.getElementById('tableNumber').value;
-        document.getElementById('customerNameModal').value = name;
-        document.getElementById('tableNumberModal').value = table;
-    }
-
-    function syncCustomerInfoFromModal() {
-        const name = document.getElementById('customerNameModal').value;
-        const table = document.getElementById('tableNumberModal').value;
-        document.getElementById('customerName').value = name;
-        document.getElementById('tableNumber').value = table;
-    }
-
-    function showToast(message) {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.classList.add('show');
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
-    }
-
-    function showStatusMessage(message, isError = false) {
-        const statusDiv = document.getElementById('statusMessage');
-        statusDiv.textContent = message;
-        statusDiv.style.color = isError ? '#dc3545' : '#28a745';
-        statusDiv.style.fontWeight = 'bold';
-        setTimeout(() => {
-            statusDiv.textContent = '';
-        }, 4000);
-    }
-
-    function toggleCart() {
-        const modal = document.getElementById('cartModal');
-        modal.classList.toggle('active');
-        if (modal.classList.contains('active')) {
-            syncCustomerInfo();
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
-    }
-    
-    // =========================================================
-    // CART & ORDER FUNCTIONS
-    // =========================================================
-
-    function addToCart(itemName, itemPrice) {
-        playSound();
-        if (cart[itemName]) {
-            cart[itemName].quantity += 1;
-        } else {
-            cart[itemName] = {
-                price: itemPrice,
-                quantity: 1
-            };
-        }
-        updateCartDisplay();
-        showToast('✅ ' + itemName + ' added to cart!');
-    }
-
-    function removeFromCart(itemName) {
-        if (cart[itemName]) {
-            cart[itemName].quantity -= 1;
-            if (cart[itemName].quantity <= 0) {
-                delete cart[itemName];
-            }
-        }
-        updateCartDisplay();
-    }
-
-    function increaseQuantity(itemName) {
-        playSound();
-        if (cart[itemName]) {
-            cart[itemName].quantity += 1;
-            updateCartDisplay();
-        }
-    }
-
-    function updateCartDisplay() {
-        const cartItemsDiv = document.getElementById('cartItemsList');
-        const cartTotalDiv = document.getElementById('cartTotal');
-        const cartBadge = document.getElementById('cartBadge');
-        cartItemsDiv.innerHTML = '';
-        total = 0;
-        let totalItems = 0;
-
-        if (Object.keys(cart).length === 0) {
-            cartItemsDiv.innerHTML = `
-                <div class="empty-cart">
-                    <div class="empty-cart-icon">🛒</div>
-                    <p>Your cart is empty</p>
-                    <p style="font-size: 0.9rem; margin-top: 5px;">Add items to get started!</p>
-                </div>
-            `;
-            cartBadge.textContent = '0';
-        } else {
-            for (let item in cart) {
-                const itemTotal = cart[item].price * cart[item].quantity;
-                total += itemTotal;
-                totalItems += cart[item].quantity;
-
-                const cartItemDiv = document.createElement('div');
-                cartItemDiv.className = 'cart-item';
-                cartItemDiv.innerHTML = `
-                    <span>${item} (₹${cart[item].price})</span>
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="removeFromCart('${item}')">−</button>
-                        <span>${cart[item].quantity}</span>
-                        <button class="quantity-btn plus" onclick="increaseQuantity('${item}')">+</button>
-                        <span>₹${itemTotal}</span>
-                    </div>
-                `;
-                cartItemsDiv.appendChild(cartItemDiv);
-            }
-            cartBadge.textContent = totalItems;
-        }
-        cartTotalDiv.textContent = `Total: ₹${total}`;
-    }
-
-    // **ORDER PLACEMENT LOGIC** (Sends/Saves the order)
-    // function sendSMS() {
-    //     syncCustomerInfoFromModal();
-    //     const customerName = document.getElementById('customerNameModal').value.trim();
-    //     const tableNumber = document.getElementById('tableNumberModal').value.trim();
-
-    //     if (Object.keys(cart).length === 0) {
-    //         showStatusMessage('Cart is empty! Please add items first.', true);
-    //         return;
-    //     }
-
-    //     if (!customerName) {
-    //         showStatusMessage('Please enter Customer Name.', true);
-    //         return;
-    //     }
-
-    //     if (!tableNumber) {
-    //         showStatusMessage('Please enter Table Number.', true);
-    //         return;
-    //     }
-
-    //     // 1. Order ko Local Storage mein save karna (Main linking step)
-    //     addOrderToHistory(customerName, tableNumber, cart, total);
-
-    //     // 2. Cart ko khali karna
-    //     cart = {};
-    //     total = 0;
-    //     updateCartDisplay();
-        
-    //     // 3. Modal band karna aur success message dikhana
-    //     toggleCart();
-    //     showToast('✅ Order Placed! (Saved to Dashboard)');
-        
-    //     // Optional: WhatsApp link generate karna (Aap isse use kar sakte hain agar chahein)
-    //     // const orderDetails = Object.keys(cart).map(item => ...).join('\n');
-    //     // const whatsappUrl = `https://wa.me/${HOTEL_PHONE}?text=${encodeURIComponent(whatsappMessage)}`;
-    //     // window.open(whatsappUrl, '_blank'); 
-    // }
-// index.html में sendSMS() function ko ye replace karo:
-
-function sendSMS() {
-    syncCustomerInfoFromModal();
-    const customerName = document.getElementById('customerNameModal').value.trim();
-    const tableNumber = document.getElementById('tableNumberModal').value.trim();
-
-    if (!customerName || !tableNumber) {
-        showStatusMessage('Please fill in all customer details!', true);
-        return;
-    }
-
-    if (Object.keys(cart).length === 0) {
-        showStatusMessage('Cart is empty! Please add items first.', true);
-        return;
-    }
-
-    // Prepare order items for storage
-    const orderItems = [];
-    for (let item in cart) {
-        orderItems.push({
-            name: item,
-            quantity: cart[item].quantity,
-            price: cart[item].price,
-            total: cart[item].price * cart[item].quantity
-        });
-    }
-
-    // Add to order history (This saves the order to localStorage)
-    addOrderToHistory(customerName, tableNumber, orderItems, total);
-
-    showStatusMessage('✅ Order sent successfully!');
-    
-    // Clear cart after sending
-    setTimeout(() => {
-        cart = {};
-        total = 0;
-        updateCartDisplay();
-        toggleCart();
-    }, 1500);
-}
-    // =========================================================
-    // EVENT LISTENERS & INITIAL LOAD
-    // =========================================================
-
-    document.addEventListener('DOMContentLoaded', function() {
-        loadOrders();
-        // Event listeners for syncing customer info between main page and modal
-        document.getElementById('customerName').addEventListener('input', syncCustomerInfo);
-        document.getElementById('tableNumber').addEventListener('input', syncCustomerInfo);
-        document.getElementById('customerNameModal').addEventListener('input', syncCustomerInfoFromModal);
-        document.getElementById('tableNumberModal').addEventListener('input', syncCustomerInfoFromModal);
-
-        // ... (Baaki existing event listeners: search, etc.)
-    });
-
-    // ... (downloadPDF function and search functions go here)
-    // downloadPDF function logic (already exists in your file)
-    function downloadPDF() { 
-        // ... (Existing downloadPDF function ka code yahan aayega)
-        if (Object.keys(cart).length === 0) { 
-            showStatusMessage('Cart is empty! Please add items first.', true); 
-            return; 
-        } 
-        const customerName = document.getElementById('customerNameModal').value.trim() || 'N/A';
-        const tableNumber = document.getElementById('tableNumberModal').value.trim() || 'N/A';
-        const { jsPDF } = window.jspdf; 
-        const doc = new jsPDF(); 
-        doc.setFontSize(20); 
-        doc.setTextColor(40, 40, 40); 
-        doc.text('MR.T Cafe - Food Order', 105, 20, { align: 'center' }); 
-        doc.setFontSize(12); 
-        doc.text(`Customer Name: ${customerName}`, 20, 40); 
-        doc.text(`Table Number: ${tableNumber}`, 20, 50); 
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 60); 
-        doc.text(`Time: ${new Date().toLocaleTimeString()}`, 20, 70); 
-        const tableData = []; 
-        for (let item in cart) { 
-            tableData.push([ 
-                item, 
-                cart[item].quantity.toString(), 
-                `₹${cart[item].price}`, 
-                `₹${cart[item].price * cart[item].quantity}` 
-            ]); 
-        } 
-        doc.autoTable({ 
-            head: [['Item', 'Qty', 'Price', 'Total']], 
-            body: tableData, 
-            startY: 80, 
-            theme: 'grid', 
-            headStyles: { fillColor: [102, 126, 234] } 
-        }); 
-        const finalY = doc.lastAutoTable.finalY + 10; 
-        doc.setFontSize(14); 
-        doc.setFont(undefined, 'bold'); 
-        doc.text(`Grand Total: ₹${total}`, 105, finalY, { align: 'center' }); 
-        doc.setFontSize(10); 
-        doc.setFont(undefined, 'normal'); 
-        doc.save(`MR.T_Cafe_Order_${customerName}_${tableNumber}.pdf`); 
-    } 
-
-    // ... (rest of search/utility functions)
-    // Note: Other functions like search, clearSearch, etc., should also be included in the final script tag.
-
   </script>
 </body>
-</html>cx
+</html>
