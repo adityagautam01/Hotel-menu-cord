@@ -922,6 +922,7 @@
 </head>
 <body>
   <!-- Floating Cart Button -->
+<!-- Floating Cart Button -->
   <button class="cart-float-btn" onclick="toggleCart()">
     🛒
     <span class="cart-badge" id="cartBadge">0</span>
@@ -943,7 +944,6 @@
         <div class="customer-info-modal">
           <label>Customer Name:</label>
           <input type="text" id="customerNameModal" placeholder="Enter Name">
-          
           <label>Table Number:</label>
           <input type="number" id="tableNumberModal" placeholder="Enter Table Number">
         </div>
@@ -955,7 +955,6 @@
             <p style="font-size: 0.9rem; margin-top: 5px;">Add items to get started!</p>
           </div>
         </div>
-
         <div class="cart-total" id="cartTotal">Total: ₹0</div>
 
         <div class="action-buttons">
@@ -1247,6 +1246,9 @@
     <div class="item"><span class="item-name">Manchurian - ₹119</span><button onclick="addToCart('Manchurian', 119)">Add</button></div>
     <div class="item"><span class="item-name">Honey Chilli Potato - ₹129</span><button onclick="addToCart('Honey Chilli Potato', 129)">Add</button></div>
     <div class="item"><span class="item-name">Chilli Paneer - ₹139</span><button onclick="addToCart('Chilli Paneer', 139)">Add</button></div>
+    <div class="item"><span class="item-name">Kung Pao Paneer - ₹149</span><button onclick="addToCart('Kung Pao Paneer', 149)">Add</button></div>
+    <div class="item"><span class="item-name">Chinese bhel - ₹109</span><button onclick="addToCart('Chinese bhel', 109)">Add</button></div>
+    <div class="item"><span class="item-name">Gravy momosr - ₹99</span><button onclick="addToCart('Gravy momos', 99)">Add</button></div>
   </div>
 
   <!-- RICE MEAL -->
@@ -1279,6 +1281,17 @@
     <div class="item"><span class="item-name">Fried Rice with Chilli Paneer - ₹149</span><button onclick="addToCart('Fried Rice with Chilli Paneer', 149)">Add</button></div>
   </div>
 
+  <!-- South Indian  -->
+   <div class="category">
+    <h2>🥡 South Indian</h2>
+    <div class="item"><span class="item-name">Plain Dosa - ₹60</span><button onclick="addToCart('Plain Dosa', 60)">Add</button></div>
+    <div class="item"><span class="item-name">Masala Dosa -70</span><button onclick="addToCart('Masala Dosa', 70)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer masala dosa - ₹90</span><button onclick="addToCart('Paneer masala dosa', 90)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer Dosa - ₹100</span><button onclick="addToCart('Paneer Dosa', 100)">Add</button></div>
+    <div class="item"><span class="item-name">Idli Smaha - ₹60</span><button onclick="addToCart('Idli Smaha', 60)">Add</button></div>
+  </div>
+
+
   <!-- DESSERTS -->
   <div class="category">
     <h2>🍰 Desserts</h2>
@@ -1289,6 +1302,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script> -->
   
   <script>
     let cart = {};
