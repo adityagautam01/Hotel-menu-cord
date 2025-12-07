@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MR.T Cafe - Food Order</title>
   <style>
-    /* ... (CSS is largely unchanged, except for adding 'new-category' style) */
+    /* ... (CSS is unchanged) ... */
 
     /* Global Styles */
     * {
@@ -795,8 +795,7 @@
         
         <div class="delivery-charge-row" id="deliveryChargeRow">
             <span>Delivery Charge:</span>
-            <span>₹20</span>
-        </div>
+            <span>₹10</span> </div>
         
         <div class="cart-total" id="cartTotal">Grand Total: ₹0</div>
 
@@ -1127,7 +1126,7 @@
   <script>
    let cart = {};
     let total = 0;
-    const DELIVERY_CHARGE = 20;
+    const DELIVERY_CHARGE = 10; // UPDATED: Delivery charge changed from 20 to 10
     const MENU_API_URL = 'https://mrt-cafe-api.onrender.com/api/menu'; // Menu API Endpoint
     
     // Global variable for AudioContext
@@ -1150,7 +1149,6 @@
                 console.error('Error fetching dynamic menu:', error);
                 // Optionally show a message to the user
                 const container = document.getElementById('newMenuItemsContainer');
-                container.innerHTML = '<p style="color: white; text-align: center;">Could not load dynamic menu items.</p>';
             });
     }
 
