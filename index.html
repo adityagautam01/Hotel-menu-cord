@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MR.T Cafe - Food Order</title>
   <style>
+    /* ... (CSS is largely unchanged, except for adding 'new-category' style) */
+
+    /* Global Styles */
     * {
       margin: 0;
       padding: 0;
@@ -70,54 +73,12 @@
       align-items: center;
       justify-content: center;
     }
-
+    
     .cart-float-btn:hover {
       transform: scale(1.1);
       box-shadow: 0 12px 32px rgba(102, 126, 234, 0.7);
     }
 
-    /* Order Details Button */
-    .order-details-btn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 1.5rem;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(245, 87, 108, 0.5);
-      z-index: 1000;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .order-details-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 12px 32px rgba(245, 87, 108, 0.7);
-    }
-
-    .order-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #28a745;
-      color: white;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: bold;
-      border: 2px solid white;
-    }
 
     .cart-badge {
       position: absolute;
@@ -136,297 +97,36 @@
       border: 2px solid white;
     }
 
-    /* Cart Modal */
-    .cart-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 2000;
-      animation: fadeIn 0.3s ease;
+    /* Modals (Cart and Location) */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        animation: fadeIn 0.3s ease;
+        align-items: center;
+        justify-content: center;
     }
 
-    .cart-modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .modal.active {
+        display: flex;
     }
 
-    /* Order Details Modal */
-    .order-details-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 2000;
-      animation: fadeIn 0.3s ease;
+    .modal-content {
+        background: white;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        animation: slideUp 0.3s ease;
     }
-
-    .order-details-modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .password-screen {
-      background: white;
-      border-radius: 20px;
-      padding: 40px;
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      animation: slideUp 0.3s ease;
-    }
-
-    .password-screen h2 {
-      color: #333;
-      margin-bottom: 20px;
-      font-size: 1.8rem;
-    }
-
-    .password-screen p {
-      color: #666;
-      margin-bottom: 25px;
-    }
-
-    .password-input-group {
-      margin-bottom: 20px;
-    }
-
-    .password-input-group input {
-      width: 100%;
-      padding: 15px;
-      border: 2px solid #e1e5e9;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-
-    .password-input-group input:focus {
-      outline: none;
-      border-color: #f5576c;
-      box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.1);
-    }
-
-    .password-buttons {
-      display: flex;
-      gap: 10px;
-    }
-
-    .password-buttons button {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .verify-btn {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-    }
-
-    .verify-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
-    }
-
-    .cancel-btn {
-      background: #e9ecef;
-      color: #333;
-    }
-
-    .cancel-btn:hover {
-      background: #dee2e6;
-    }
-
-    .password-error {
-      color: #dc3545;
-      margin-top: 10px;
-      font-size: 0.9rem;
-      display: none;
-    }
-
-    .password-error.show {
-      display: block;
-    }
-
-    .orders-list-container {
-      background: white;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 800px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      animation: slideUp 0.3s ease;
-    }
-
-    .orders-header {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-      padding: 20px;
-      border-radius: 20px 20px 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .orders-header h2 {
-      font-size: 1.5rem;
-      margin: 0;
-    }
-
-    .close-orders {
-      background: transparent;
-      border: none;
-      color: white;
-      font-size: 1.8rem;
-      cursor: pointer;
-      width: 35px;
-      height: 35px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      transition: all 0.3s ease;
-    }
-
-    .close-orders:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: rotate(90deg);
-    }
-
-    .orders-body {
-      padding: 20px;
-    }
-
-    .order-card {
-      background: #f8f9fa;
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      border-left: 5px solid #f5576c;
-    }
-
-    .order-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #dee2e6;
-    }
-
-    .order-number {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #f5576c;
-    }
-
-    .order-time {
-      color: #6c757d;
-      font-size: 0.9rem;
-    }
-
-    .customer-details {
-      margin-bottom: 15px;
-      padding: 10px;
-      background: white;
-      border-radius: 8px;
-    }
-
-    .customer-details p {
-      margin: 5px 0;
-      color: #495057;
-    }
-
-    .customer-details strong {
-      color: #212529;
-    }
-
-    .order-items-list {
-      margin: 15px 0;
-    }
-
-    .order-item-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #e9ecef;
-    }
-
-    .order-item-row:last-child {
-      border-bottom: none;
-    }
-
-    .order-total {
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #28a745;
-      text-align: right;
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 2px solid #dee2e6;
-    }
-
-    .empty-orders {
-      text-align: center;
-      padding: 60px 20px;
-      color: #999;
-    }
-
-    .empty-orders-icon {
-      font-size: 4rem;
-      margin-bottom: 10px;
-    }
-
-    .delete-order-btn {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.3s ease;
-    }
-
-    .delete-order-btn:hover {
-      background: #c82333;
-      transform: translateY(-2px);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .cart-modal-content {
-      background: white;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      animation: slideUp 0.3s ease;
-    }
-
+    
     @keyframes slideUp {
       from {
         opacity: 0;
@@ -438,7 +138,8 @@
       }
     }
 
-    .cart-header {
+
+    .modal-header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       padding: 20px;
@@ -448,12 +149,12 @@
       align-items: center;
     }
 
-    .cart-header h2 {
+    .modal-header h2 {
       font-size: 1.5rem;
       margin: 0;
     }
 
-    .close-cart {
+    .close-modal {
       background: transparent;
       border: none;
       color: white;
@@ -468,17 +169,79 @@
       transition: all 0.3s ease;
     }
 
-    .close-cart:hover {
+    .close-modal:hover {
       background: rgba(255, 255, 255, 0.2);
       transform: rotate(90deg);
     }
+    
+    /* Location Modal Specific Styles */
+    #locationModal .modal-content {
+        max-width: 350px;
+        padding: 20px;
+    }
+    
+    #locationModal .modal-content > h2 {
+        color: #333;
+        margin-bottom: 15px;
+        text-align: center;
+        font-size: 1.3rem;
+    }
+    
+    #locationModal select, #locationModal input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+        background-color: white;
+    }
+    
+    #locationModal label {
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 5px;
+        display: block;
+    }
 
+    .location-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .location-actions button {
+        flex-grow: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    
+    #cancelLocation {
+        background: #f0f0f0;
+        color: #333;
+    }
+    
+    #confirmLocation {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    /* Cart Content Styles */
     .cart-body {
       padding: 20px;
     }
 
     .customer-info-modal {
       margin-bottom: 20px;
+      border: 1px solid #eee;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #f9f9f9;
     }
 
     .customer-info-modal label {
@@ -489,25 +252,40 @@
       font-size: 0.9rem;
     }
 
-    .customer-info-modal input {
+    .customer-info-modal input, .customer-info-modal select {
       width: 100%;
       padding: 10px;
       border: 2px solid #e1e5e9;
       border-radius: 8px;
       margin-bottom: 15px;
       transition: all 0.3s ease;
-    }
-
-    .customer-info-modal input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      background-color: white;
     }
 
     .mobile-input-group {
-      display: none;
+      transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
     }
 
+    .mobile-input-group.show {
+        max-height: 100px; 
+        opacity: 1;
+    }
+
+    .delivery-charge-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-top: 1px solid #eee;
+        font-weight: bold;
+        color: #dc3545;
+        display: none; 
+    }
+    
+    /* Cart Item Styles */
     .cart-items-list {
       margin: 20px 0;
       max-height: 300px;
@@ -525,7 +303,7 @@
     .cart-item:last-child {
       border-bottom: none;
     }
-
+    
     .quantity-controls {
       display: flex;
       align-items: center;
@@ -574,7 +352,7 @@
       flex-direction: column;
       margin-top: 20px;
     }
-
+    
     .action-buttons button {
       padding: 12px 25px;
       border: none;
@@ -590,92 +368,40 @@
       background: linear-gradient(135deg, #28a745, #20c997);
       box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
     }
-
-    .send-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-    }
-
+    
     .pdf-btn {
       background: linear-gradient(135deg, #6c757d, #495057);
       box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
     }
 
-    .pdf-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
-    }
-
-    .empty-cart {
-      text-align: center;
-      padding: 40px 20px;
-      color: #999;
-    }
-
-    .empty-cart-icon {
-      font-size: 4rem;
-      margin-bottom: 10px;
-    }
-
-    /* Toast Notification */
-    .toast {
-      position: fixed;
-      top: 100px;
-      right: 20px;
-      background: linear-gradient(135deg, #28a745, #20c997);
-      color: white;
-      padding: 15px 25px;
-      border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(40, 167, 69, 0.4);
-      z-index: 3000;
-      animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 2.5s;
-      font-weight: bold;
-      display: none;
-    }
-
-    .toast.show {
-      display: block;
-    }
-
-    @keyframes slideInRight {
-      from {
-        opacity: 0;
-        transform: translateX(100px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes slideOutRight {
-      from {
-        opacity: 1;
-        transform: translateX(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateX(100px);
-      }
-    }
-
+    /* Main Page Customer Info Layout (Updated) */
     .customer-info {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 20px;
-      border-radius: 15px;
-      margin-bottom: 30px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-      animation: fadeInUp 1s ease-out 0.2s both;
-      display: flex;
-      gap: 15px;
-      align-items: center;
-      flex-wrap: wrap;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        animation: fadeInUp 1s ease-out 0.2s both;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
     }
 
     .customer-info-field {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+    
+    /* Input Container for Table/Room and Contact */
+    .customer-details-container {
+        display: flex;
+        flex-grow: 1;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
     }
 
     .customer-info label {
@@ -684,20 +410,53 @@
       white-space: nowrap;
     }
 
-    .customer-info input {
+    .customer-info input, .customer-info select {
       padding: 10px;
       border: 2px solid #e1e5e9;
       border-radius: 8px;
       transition: all 0.3s ease;
       min-width: 150px;
+      background-color: white;
+    }
+    
+    /* New Button for Delivery Location */
+    .delivery-location-btn {
+        background: linear-gradient(135deg, #764ba2, #667eea);
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+        flex-shrink: 0;
     }
 
-    .customer-info input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    .delivery-location-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
     }
-
+    
+    /* Highlight the delivery button if a hostel is selected */
+    .delivery-location-btn.selected {
+        background: linear-gradient(135deg, #28a745, #20c997);
+    }
+    
+    /* Contact Input visibility in main container */
+    .mobile-input-group-main {
+        transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+    }
+    .mobile-input-group-main.show {
+        max-height: 100px;
+        opacity: 1;
+    }
+    
+    /* --- Search & Menu Styles --- */
+    
     .search-container {
       background: rgba(255, 255, 255, 0.95);
       padding: 20px;
@@ -720,7 +479,7 @@
       font-size: 1.1rem;
       transition: all 0.3s ease;
     }
-
+    
     .search-box input:focus {
       outline: none;
       border-color: #667eea;
@@ -736,7 +495,7 @@
       color: #667eea;
       pointer-events: none;
     }
-
+    
     .clear-search {
       position: absolute;
       right: 55px;
@@ -756,44 +515,8 @@
       transition: all 0.3s ease;
     }
 
-    .clear-search:hover {
-      background: #c82333;
-      transform: translateY(-50%) scale(1.1);
-    }
-
     .clear-search.show {
       display: flex;
-    }
-
-    .search-results-info {
-      margin-top: 10px;
-      color: #667eea;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .category.hidden {
-      display: none;
-    }
-
-    .item.hidden {
-      display: none;
-    }
-
-    .item.highlight {
-      background-color: #fff3cd;
-      border-left: 4px solid #ffc107;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     .category {
@@ -803,6 +526,11 @@
       overflow: hidden;
       box-shadow: 0 8px 32px rgba(0,0,0,0.2);
       animation: fadeInUp 1s ease-out 0.4s both;
+    }
+    
+    /* NEW: Styling for API fetched Categories */
+    .category.new-category h2 {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     }
 
     .category h2 {
@@ -858,7 +586,31 @@
     .item button:active {
       transform: translateY(0);
     }
+    
+    .category.hidden {
+      display: none;
+    }
 
+    .item.hidden {
+      display: none;
+    }
+
+    .item.highlight {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     .status-message {
       margin-top: 10px;
       padding: 10px;
@@ -878,6 +630,48 @@
       color: #721c24;
       border: 1px solid #f5c6cb;
     }
+    
+    .toast {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(40, 167, 69, 0.4);
+      z-index: 3000;
+      animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 2.5s;
+      font-weight: bold;
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(100px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideOutRight {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateX(100px);
+      }
+    }
+
 
     @media (max-width: 768px) {
       body {
@@ -885,20 +679,28 @@
         padding-top: 80px;
       }
 
-      h1 {
-        font-size: 2rem;
-      }
-
       .customer-info {
-        padding: 15px;
-        justify-content: center;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .delivery-location-btn {
+          width: 100%;
+          margin-bottom: 10px;
+      }
+      
+      .customer-details-container {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
       }
 
       .customer-info-field {
         width: 100%;
+        display: block;
       }
 
-      .customer-info input {
+      .customer-info input, .customer-info select {
         width: 100%;
         min-width: auto;
       }
@@ -912,7 +714,7 @@
       .cart-modal-content {
         width: 95%;
       }
-
+      
       .toast {
         right: 10px;
         left: 10px;
@@ -921,31 +723,66 @@
   </style>
 </head>
 <body>
-  <!-- Floating Cart Button -->
-<!-- Floating Cart Button -->
   <button class="cart-float-btn" onclick="toggleCart()">
     🛒
     <span class="cart-badge" id="cartBadge">0</span>
   </button>
 
-  
-
-  <!-- Toast Notification -->
   <div class="toast" id="toast">✅ Added to cart!</div>
+  
+  <div class="modal" id="locationModal">
+    <div class="modal-content">
+        <h2>Select Delivery Location</h2>
+        
+        <label for="hostelNameSelector" style="color: #667eea; font-size: 1.1rem;">Select Hostel Name:</label>
+        <select id="hostelNameSelector">
+            <option value="Table Order">Canteen Dine-In (No Delivery)</option>
+            <option value="Rukmani - 1">Rukmani - 1</option>
+            <option value="Rukmani - 2">Rukmani - 2</option>
+            <option value="MBBS Girls Gate - 1">MBBS Girls Gate - 1</option>
+            <option value="MBBS Girls Gate - 2">MBBS Girls Gate - 2</option>
+            <option value="Old Boys Hostel">Old Boys Hostel</option>
+            <option value="P.G Boys Hostel">P.G Boys Hostel</option>
+            <option value="RAMAN House">RAMAN House</option>
+            <option value="Sushrut Hostel">Sushrut Hostel</option>
+            <option value="Kalpuna Hostel">Kalpuna Hostel</option>
+            <option value="Rani laxmi Bai Hostel">Rani laxmi Bai Hostel</option>
+            </select>
 
-  <!-- Cart Modal -->
-  <div class="cart-modal" id="cartModal">
-    <div class="cart-modal-content">
-      <div class="cart-header">
-        <h2>🛒 Your Cart</h2>
-        <button class="close-cart" onclick="toggleCart()">×</button>
+        
+        <label for="contactNumberLocation">Contact Number (10 digits):</label>
+        <input type="tel" id="contactNumberLocation" placeholder="Contact Number (Mandatory for Delivery)" maxlength="10">
+
+        <div class="location-actions">
+            <button id="cancelLocation" onclick="toggleLocationModal()">Cancel</button>
+            <button id="confirmLocation" onclick="confirmDeliveryLocation()">Confirm Location</button>
+        </div>
+    </div>
+  </div>
+
+
+  <div class="modal" id="cartModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛒 Your Order</h2>
+        <button class="close-modal" onclick="toggleCart()">×</button>
       </div>
       <div class="cart-body">
         <div class="customer-info-modal">
-          <label>Customer Name:</label>
-          <input type="text" id="customerNameModal" placeholder="Enter Name">
-          <label>Table Number:</label>
-          <input type="number" id="tableNumberModal" placeholder="Enter Table Number">
+          <input type="hidden" id="hotelNameModal"> 
+          <input type="hidden" id="tableNumberModal">
+          <input type="hidden" id="contactNumberModal">
+          
+          <label>Location:</label>
+          <input type="text" id="locationDisplayInCart" readonly style="font-weight: bold; margin-bottom: 10px;">
+
+          <label id="tableRoomLabelModal">Table/Room Number:</label>
+          <input type="text" id="tableNumberDisplayInCart" readonly style="margin-bottom: 10px;">
+          
+          <div class="mobile-input-group" id="contactGroupModal">
+            <label>Contact Number (Delivery):</label>
+            <input type="text" id="contactNumberDisplayInCart" readonly>
+          </div>
         </div>
 
         <div class="cart-items-list" id="cartItemsList">
@@ -955,10 +792,16 @@
             <p style="font-size: 0.9rem; margin-top: 5px;">Add items to get started!</p>
           </div>
         </div>
-        <div class="cart-total" id="cartTotal">Total: ₹0</div>
+        
+        <div class="delivery-charge-row" id="deliveryChargeRow">
+            <span>Delivery Charge:</span>
+            <span>₹20</span>
+        </div>
+        
+        <div class="cart-total" id="cartTotal">Grand Total: ₹0</div>
 
         <div class="action-buttons">
-          <button class="send-btn" onclick="sendSMS()">📱 SEND SMS</button>
+          <button class="send-btn" onclick="sendSMS()">✅ PLACE ORDER</button>
           <button class="pdf-btn" onclick="downloadPDF()">🧾 Download Bill</button>
         </div>
         <div id="statusMessage"></div>
@@ -972,14 +815,23 @@
   <p class="tagline">A Taste of Home, Away from Home</p>
 
   <div class="customer-info">
-    <div class="customer-info-field">
-      <label>Customer Name:</label>
-      <input type="text" id="customerName" placeholder="Enter Name">
+    <button class="delivery-location-btn" id="setDeliveryLocationBtn" onclick="toggleLocationModal()">
+      Set Delivery Location
+    </button>
+    
+    <div class="customer-details-container">
+        <div class="customer-info-field">
+            <label id="tableRoomLabel">Table Number:</label>
+            <input type="text" id="tableNumber" placeholder="Enter Table Number">
+        </div>
+        
+        <div class="customer-info-field mobile-input-group-main" id="contactGroupMain">
+            <label>Contact Number:</label>
+            <input type="tel" id="contactNumber" placeholder="Enter Contact Number (10 digits)" maxlength="10">
+        </div>
     </div>
-    <div class="customer-info-field">
-      <label>Table Number:</label>
-      <input type="number" id="tableNumber" placeholder="Enter Table Number">
-    </div>
+    
+    <input type="hidden" id="hotelName" value="Table Order"> 
   </div>
 
   <div class="search-container">
@@ -990,8 +842,7 @@
     </div>
     <div class="search-results-info" id="searchResultsInfo"></div>
   </div>
-
-  <!-- CHAI SHAI -->
+  
   <div class="category">
     <h2>☕ Chai Shai</h2>
     <div class="item"><span class="item-name">Adrak Tea - ₹15</span><button onclick="addToCart('Adrak Tea', 15)">Add</button></div>
@@ -999,7 +850,6 @@
     <div class="item"><span class="item-name">Cinnamon Tea - ₹25</span><button onclick="addToCart('Cinnamon Tea', 25)">Add</button></div>
   </div>
 
-  <!-- COFFEE -->
   <div class="category">
     <h2>☕ Coffee</h2>
     <div class="item"><span class="item-name">Black Coffee - ₹15</span><button onclick="addToCart('Black Coffee', 15)">Add</button></div>
@@ -1009,7 +859,6 @@
     <div class="item"><span class="item-name">Cold Coffee - ₹89</span><button onclick="addToCart('Cold Coffee', 89)">Add</button></div>
   </div>
 
-  <!-- SHAKES -->
   <div class="category">
     <h2>🥤 Shakes</h2>
     <div class="item"><span class="item-name">Lassi - ₹50</span><button onclick="addToCart('Lassi', 50)">Add</button></div>
@@ -1023,7 +872,6 @@
     <div class="item"><span class="item-name">Mango Shake - ₹60</span><button onclick="addToCart('Mango Shake', 60)">Add</button></div>
   </div>
 
-  <!-- ICE TEA -->
   <div class="category">
     <h2>🧊 Ice Tea</h2>
     <div class="item"><span class="item-name">Lemon Ice Tea - ₹59</span><button onclick="addToCart('Lemon Ice Tea', 59)">Add</button></div>
@@ -1031,7 +879,6 @@
     <div class="item"><span class="item-name">Mint Ice Tea - ₹59</span><button onclick="addToCart('Mint Ice Tea', 59)">Add</button></div>
   </div>
 
-  <!-- MOCKTAILS -->
   <div class="category">
     <h2>🹠Mocktails</h2>
     <div class="item"><span class="item-name">Virgin Mojito - ₹59</span><button onclick="addToCart('Virgin Mojito', 59)">Add</button></div>
@@ -1042,7 +889,6 @@
     <div class="item"><span class="item-name">Tamarind - ₹59</span><button onclick="addToCart('Tamarind', 59)">Add</button></div>
   </div>
 
-  <!-- SOFT DRINKS -->
   <div class="category">
     <h2>🥤 Soft Drinks</h2>
     <div class="item"><span class="item-name">Water - ₹20</span><button onclick="addToCart('Water', 20)">Add</button></div>
@@ -1051,7 +897,6 @@
     <div class="item"><span class="item-name">Masala Lemonade - ₹50</span><button onclick="addToCart('Masala Lemonade', 50)">Add</button></div>
   </div>
 
-  <!-- SOUPS -->
   <div class="category">
     <h2>🲠Soups</h2>
     <div class="item"><span class="item-name">Sweet Corn Soup - ₹79</span><button onclick="addToCart('Sweet Corn Soup', 79)">Add</button></div>
@@ -1061,7 +906,6 @@
     <div class="item"><span class="item-name">Mex Chilli Beans - ₹99</span><button onclick="addToCart('Mex Chilli Beans', 99)">Add</button></div>
   </div>
 
-  <!-- MAGGIE -->
   <div class="category">
     <h2>🜠Maggie</h2>
     <div class="item"><span class="item-name">Veg Maggie - ₹55</span><button onclick="addToCart('Veg Maggie', 55)">Add</button></div>
@@ -1070,7 +914,6 @@
     <div class="item"><span class="item-name">Cheese Maggie - ₹99</span><button onclick="addToCart('Cheese Maggie', 99)">Add</button></div>
   </div>
 
-  <!-- SANDWICHES -->
   <div class="category">
     <h2>🥪 Sandwiches</h2>
     <div class="item"><span class="item-name">Veg Sandwich - ₹89</span><button onclick="addToCart('Veg Sandwich', 89)">Add</button></div>
@@ -1080,7 +923,6 @@
     <div class="item"><span class="item-name">Spicy Paneer - ₹89</span><button onclick="addToCart('Spicy Paneer', 89)">Add</button></div>
   </div>
 
-  <!-- MOMOS -->
   <div class="category">
     <h2>🥟 Momos</h2>
     <div class="item"><span class="item-name">Steamed Veg - ₹55</span><button onclick="addToCart('Steamed Veg', 55)">Add</button></div>
@@ -1091,7 +933,6 @@
     <div class="item"><span class="item-name">Veggie Crunch Roll - ₹55</span><button onclick="addToCart('Veggie Crunch Roll', 55)">Add</button></div>
   </div>
 
-  <!-- BURGER -->
   <div class="category">
     <h2>🍔 Burger</h2>
     <div class="item"><span class="item-name">Veggie Burger - ₹59</span><button onclick="addToCart('Veggie Burger', 59)">Add</button></div>
@@ -1100,7 +941,6 @@
     <div class="item"><span class="item-name">Cheese Loaded - ₹89</span><button onclick="addToCart('Cheese Loaded', 89)">Add</button></div>
   </div>
 
-  <!-- CORN -->
   <div class="category">
     <h2>🌽 Corn</h2>
     <div class="item"><span class="item-name">Sweet Corn - ₹69</span><button onclick="addToCart('Sweet Corn', 69)">Add</button></div>
@@ -1108,7 +948,6 @@
     <div class="item"><span class="item-name">Crispy Corn - ₹109</span><button onclick="addToCart('Crispy Corn', 109)">Add</button></div>
   </div>
 
-  <!-- PASTA -->
   <div class="category">
     <h2>🍝 Pasta</h2>
     <div class="item"><span class="item-name">White Sauce - ₹99</span><button onclick="addToCart('White Sauce', 99)">Add</button></div>
@@ -1116,7 +955,6 @@
     <div class="item"><span class="item-name">Pink Sauce - ₹119</span><button onclick="addToCart('Pink Sauce', 119)">Add</button></div>
   </div>
 
-  <!-- FRIES -->
   <div class="category">
     <h2>🍟 Fries</h2>
     <div class="item"><span class="item-name">Crunchy French Fries - ₹69</span><button onclick="addToCart('Crunchy French Fries', 69)">Add</button></div>
@@ -1124,7 +962,6 @@
     <div class="item"><span class="item-name">Cheese Fries - ₹89</span><button onclick="addToCart('Cheese Fries', 89)">Add</button></div>
   </div>
 
-  <!-- PIZZA -->
   <div class="category">
     <h2>🍕 Pizza</h2>
     <div class="item"><span class="item-name">Queen Margherita - ₹149</span><button onclick="addToCart('Queen Margherita', 149)">Add</button></div>
@@ -1135,7 +972,6 @@
     <div class="item"><span class="item-name">Garlic Bread - ₹79</span><button onclick="addToCart('Garlic Bread', 79)">Add</button></div>
   </div>
 
-  <!-- WRAPS -->
   <div class="category">
     <h2>🌯 Wraps</h2>
     <div class="item"><span class="item-name">Aalu Tikki Wrap - ₹79</span><button onclick="addToCart('Aalu Tikki Wrap', 79)">Add</button></div>
@@ -1145,7 +981,6 @@
     <div class="item"><span class="item-name">Cheese Veggie - ₹99</span><button onclick="addToCart('Cheese Veggie', 99)">Add</button></div>
   </div>
 
-  <!-- MORNING MASALA -->
   <div class="category">
     <h2>🌅 Morning Masala</h2>
     <div class="item"><span class="item-name">Samosa (2 Pcs) - ₹25</span><button onclick="addToCart('Samosa (2 Pcs)', 25)">Add</button></div>
@@ -1156,7 +991,6 @@
     <div class="item"><span class="item-name">Pav Bhaji - ₹80</span><button onclick="addToCart('Pav Bhaji', 80)">Add</button></div>
   </div>
 
-  <!-- PARANTHA -->
   <div class="category">
     <h2>🫓 Parantha</h2>
     <div class="item"><span class="item-name">Aalu Parantha - ₹50</span><button onclick="addToCart('Aalu Parantha', 50)">Add</button></div>
@@ -1166,7 +1000,6 @@
     <div class="item"><span class="item-name">Paneer Parantha - ₹75</span><button onclick="addToCart('Paneer Parantha', 75)">Add</button></div>
   </div>
 
-  <!-- PAKODA -->
   <div class="category">
     <h2>🥘 Pakoda</h2>
     <div class="item"><span class="item-name">Pyaj Pakoda - ₹20</span><button onclick="addToCart('Pyaj Pakoda', 20)">Add</button></div>
@@ -1175,7 +1008,6 @@
     <div class="item"><span class="item-name">Paneer Pakoda - ₹99</span><button onclick="addToCart('Paneer Pakoda', 99)">Add</button></div>
   </div>
 
-  <!-- INDIAN KHAJANA -->
   <div class="category">
     <h2>🍛 Indian Khajana</h2>
     <div class="item"><span class="item-name">Dal Tadka - ₹89</span><button onclick="addToCart('Dal Tadka', 89)">Add</button></div>
@@ -1195,7 +1027,6 @@
     <div class="item"><span class="item-name">Shahi Paneer - ₹189</span><button onclick="addToCart('Shahi Paneer', 189)">Add</button></div>
   </div>
 
-  <!-- RICE -->
   <div class="category">
     <h2>🍚 Rice</h2>
     <div class="item"><span class="item-name">Plain Rice - ₹99</span><button onclick="addToCart('Plain Rice', 99)">Add</button></div>
@@ -1205,7 +1036,6 @@
     <div class="item"><span class="item-name">Veg Biryani - ₹129</span><button onclick="addToCart('Veg Biryani', 129)">Add</button></div>
   </div>
 
-  <!-- BREAD -->
   <div class="category">
     <h2>🍞 Bread</h2>
     <div class="item"><span class="item-name">Tawa Roti - ₹10</span><button onclick="addToCart('Tawa Roti', 10)">Add</button></div>
@@ -1214,13 +1044,11 @@
     <div class="item"><span class="item-name">Plain Parantha - ₹15</span><button onclick="addToCart('Plain Parantha', 15)">Add</button></div>
   </div>
 
-  <!-- SALADS & RAITA -->
   <div class="category">
     <h2>🥗 Salads & Raita</h2>
     <div class="item"><span class="item-name">Green Salad - ₹59</span><button onclick="addToCart('Green Salad', 59)">Add</button></div>
   </div>
 
-  <!-- NOODLES -->
   <div class="category">
     <h2>🍜 Noodles</h2>
     <div class="item"><span class="item-name">Desi Noodles - ₹99</span><button onclick="addToCart('Desi Noodles', 99)">Add</button></div>
@@ -1230,7 +1058,6 @@
     <div class="item"><span class="item-name">Singapuria Noodles - ₹129</span><button onclick="addToCart('Singapuria Noodles', 129)">Add</button></div>
   </div>
 
-  <!-- CHINESE RICE -->
   <div class="category">
     <h2>🍚 Chinese Rice</h2>
     <div class="item"><span class="item-name">Fried Rice - ₹109</span><button onclick="addToCart('Fried Rice', 109)">Add</button></div>
@@ -1239,7 +1066,6 @@
     <div class="item"><span class="item-name">Paneer Fried Rice - ₹129</span><button onclick="addToCart('Paneer Fried Rice', 129)">Add</button></div>
   </div>
 
-  <!-- FLAVORS OF KANPUR -->
   <div class="category">
     <h2>🌶️ Flavors of Kanpur</h2>
     <div class="item"><span class="item-name">Chilli Potato - ₹109</span><button onclick="addToCart('Chilli Potato', 109)">Add</button></div>
@@ -1251,7 +1077,6 @@
     <div class="item"><span class="item-name">Gravy momosr - ₹99</span><button onclick="addToCart('Gravy momos', 99)">Add</button></div>
   </div>
 
-  <!-- RICE MEAL -->
   <div class="category">
     <h2>🍱 Rice Meal</h2>
     <div class="item"><span class="item-name">Dal Rice - ₹89</span><button onclick="addToCart('Dal Rice', 89)">Add</button></div>
@@ -1259,20 +1084,17 @@
     <div class="item"><span class="item-name">Rajma Rice - ₹109</span><button onclick="addToCart('Rajma Rice', 109)">Add</button></div>
   </div>
 
-  <!-- THALI -->
   <div class="category">
     <h2>🍽️ Thali</h2>
     <div class="item"><span class="item-name">Eco Thali (4 Roti + Mix Veg + Dal + Rice + Salad) - ₹149</span><button onclick="addToCart('Eco Thali', 149)">Add</button></div>
     <div class="item"><span class="item-name">Deluxe Thali (4 Roti + Paneer Sabji + Dal + Rice + Salad) - ₹179</span><button onclick="addToCart('Deluxe Thali', 179)">Add</button></div>
   </div>
 
-  <!-- ECO MEAL -->
   <div class="category">
     <h2>🍱 Eco Meal</h2>
     <div class="item"><span class="item-name">4 Roti With Paneer of the Day + Salad - ₹109</span><button onclick="addToCart('4 Roti With Paneer + Salad', 109)">Add</button></div>
   </div>
 
-  <!-- CHINESE COMBO -->
   <div class="category">
     <h2>🥡 Chinese Combo</h2>
     <div class="item"><span class="item-name">Noodles with Manchurian - ₹129</span><button onclick="addToCart('Noodles with Manchurian', 129)">Add</button></div>
@@ -1281,8 +1103,7 @@
     <div class="item"><span class="item-name">Fried Rice with Chilli Paneer - ₹149</span><button onclick="addToCart('Fried Rice with Chilli Paneer', 149)">Add</button></div>
   </div>
 
-  <!-- South Indian  -->
-   <div class="category">
+  <div class="category">
     <h2>🥡 South Indian</h2>
     <div class="item"><span class="item-name">Plain Dosa - ₹60</span><button onclick="addToCart('Plain Dosa', 60)">Add</button></div>
     <div class="item"><span class="item-name">Masala Dosa -70</span><button onclick="addToCart('Masala Dosa', 70)">Add</button></div>
@@ -1292,107 +1113,610 @@
   </div>
 
 
-  <!-- DESSERTS -->
   <div class="category">
     <h2>🍰 Desserts</h2>
     <div class="item"><span class="item-name">Ice Cream - ₹49</span><button onclick="addToCart('Ice Cream', 49)">Add</button></div>
     <div class="item"><span class="item-name">Brownie - ₹75</span><button onclick="addToCart('Brownie', 75)">Add</button></div>
     <div class="item"><span class="item-name">Brownie with Ice Cream - ₹99</span><button onclick="addToCart('Brownie with Ice Cream', 99)">Add</button></div>
   </div>
-
+  <div id="newMenuItemsContainer"></div>
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script> -->
   
   <script>
-    let cart = {};
+   let cart = {};
     let total = 0;
-    let allOrders = [];
-    let orderCounter = 1;
-
-    const HOTEL_PHONE = '916387166447';
-    const OWNER_PASSWORD = '5555'; // 🔐 Change this password as needed
-
-    // Load orders from storage
-    function loadOrders() {
-      const stored = localStorage.getItem('mrtCafeOrders');
-      if (stored) {
-        try {
-          const data = JSON.parse(stored);
-          allOrders = data.orders || [];
-          orderCounter = data.counter || 1;
-          updateOrderBadge();
-        } catch (e) {
-          allOrders = [];
-          orderCounter = 1;
-        }
-      }
-    }
-
-    // Save orders to storage
-    function saveOrders() {
-      localStorage.setItem('mrtCafeOrders', JSON.stringify({
-        orders: allOrders,
-        counter: orderCounter
-      }));
-      updateOrderBadge();
-    }
-
-    // Update order badge (guarded for element absence on front page)
-    function updateOrderBadge() {
-      const badge = document.getElementById('orderBadge');
-      if (badge) {
-        badge.textContent = allOrders.length;
-      }
-    }
-
+    const DELIVERY_CHARGE = 20;
+    const MENU_API_URL = 'https://mrt-cafe-api.onrender.com/api/menu'; // Menu API Endpoint
     
-
-    // Add order to history
-    function addOrderToHistory(customerName, tableNumber, cartItems, totalAmount) {
-      const order = {
-        orderNumber: orderCounter++,
-        customerName: customerName,
-        tableNumber: tableNumber,
-        items: cartItems,
-        total: totalAmount,
-        date: new Date().toLocaleDateString('en-GB'),
-        time: new Date().toLocaleTimeString(),
-        timestamp: Date.now()
-      };
-      
-      allOrders.push(order);
-      saveOrders();
+    // Global variable for AudioContext
+    let audioContext;
+    let audioReady = false;
+    
+    // --- NEW: Function to Fetch and Render API Menu Items ---
+    function fetchMenuDataAndRender() {
+        fetch(MENU_API_URL)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch new menu items.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                renderNewMenuItems(data);
+            })
+            .catch(error => {
+                console.error('Error fetching dynamic menu:', error);
+                // Optionally show a message to the user
+                const container = document.getElementById('newMenuItemsContainer');
+                container.innerHTML = '<p style="color: white; text-align: center;">Could not load dynamic menu items.</p>';
+            });
     }
 
-    // Initialize orders storage on front page
+    function renderNewMenuItems(items) {
+        const container = document.getElementById('newMenuItemsContainer');
+        container.innerHTML = '';
+        
+        // Group items by category
+        const categories = items.reduce((acc, item) => {
+            if (!acc[item.category]) {
+                acc[item.category] = {
+                    emoji: item.emoji || '⭐', // Use saved emoji or default
+                    items: []
+                };
+            }
+            acc[item.category].items.push(item);
+            return acc;
+        }, {});
+        
+        // Render each category group
+        for (const catName in categories) {
+            const catData = categories[catName];
+            
+            const categoryDiv = document.createElement('div');
+            // Add a special class to style dynamically added categories differently
+            categoryDiv.className = 'category new-category'; 
+            categoryDiv.innerHTML = `<h2>${catData.emoji} ${catName} (New)</h2>`;
+            
+            catData.items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.innerHTML = `
+                    <span class="item-name">${item.name} - ₹${item.price}</span>
+                    <button onclick="addToCart('${item.name}', ${item.price})">Add</button>
+                `;
+                categoryDiv.appendChild(itemDiv);
+            });
+            
+            container.appendChild(categoryDiv);
+        }
+    }
+    // --- END NEW FUNCTION ---
+
+
+    // Initialize AudioContext on user interaction
+    function initAudioContext() {
+        if (!audioReady) {
+            try {
+                // Ensure context is running if it was suspended (e.g., on first click)
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                audioReady = true;
+                // Once initialized/resumed, remove the listener
+                document.body.removeEventListener('click', initAudioContext, { once: true });
+                document.body.removeEventListener('touchend', initAudioContext, { once: true });
+                
+            } catch (e) {
+                console.warn('Web Audio API not supported or error during initialization:', e);
+            }
+        }
+    }
+
+    // Attach listener for first click/tap to resume AudioContext
     document.addEventListener('DOMContentLoaded', function() {
-      loadOrders();
+        document.body.addEventListener('click', initAudioContext, { once: true });
+        document.body.addEventListener('touchend', initAudioContext, { once: true });
+        syncCustomerInfo(); 
+        fetchMenuDataAndRender(); // Fetch dynamic menu items on load
     });
 
-    function syncCustomerInfo() {
-      const name = document.getElementById('customerName').value;
-      const table = document.getElementById('tableNumber').value;
 
-      document.getElementById('customerNameModal').value = name;
+    function playSound() {
+        // We only attempt to play sound if initialization has run
+        if (audioReady && audioContext && audioContext.state === 'running') {
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 700; // Slightly lower frequency for clear notification
+                oscillator.type = 'sine';
+                
+                // Quick attack and decay
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.01);
+                gainNode.gain.linearRampToValueAtTime(0.0001, audioContext.currentTime + 0.15);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.15);
+            } catch (error) {
+                console.error("Audio playback error:", error);
+            }
+        } else {
+            console.log("AudioContext not ready or running.");
+            // Try initializing one more time if a click occurred but context wasn't running
+            initAudioContext();
+        }
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.remove('show'); // Reset animation
+      void toast.offsetWidth; // Trigger reflow
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // --- Core Add to Cart Function ---
+    function addToCart(itemName, price) {
+      playSound();
+      showToast();
+      
+      if (cart[itemName]) {
+        cart[itemName].quantity += 1;
+      } else {
+        cart[itemName] = { price: price, quantity: 1 };
+      }
+      updateCartDisplay();
+    }
+    // ---------------------------------
+    
+    function removeFromCart(itemName) {
+      if (cart[itemName] && cart[itemName].quantity > 1) {
+        cart[itemName].quantity -= 1;
+      } else {
+        delete cart[itemName];
+      }
+      updateCartDisplay();
+    }
+
+    function increaseQuantity(itemName) {
+      playSound();
+      if (cart[itemName]) {
+        cart[itemName].quantity += 1;
+        updateCartDisplay();
+      }
+    }
+
+
+    // --- Location Modal Logic ---
+    function toggleLocationModal() {
+        const modal = document.getElementById('locationModal');
+
+        if (modal.classList.contains('active')) {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        } else {
+            // Sync current main data to the modal controls when opening
+            const currentHotel = document.getElementById('hotelName').value;
+            const currentContact = document.getElementById('contactNumber').value;
+            // The tableNumber on the main page is repurposed to store the Hostel Name for delivery
+            const currentTable = document.getElementById('tableNumber').value; 
+
+            document.getElementById('hostelNameSelector').value = currentHotel;
+            document.getElementById('contactNumberLocation').value = currentContact;
+            // Removed roomNumberLocation sync
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function confirmDeliveryLocation() {
+        const selectedHotel = document.getElementById('hostelNameSelector').value;
+        const selectedContact = document.getElementById('contactNumberLocation').value.trim();
+        const isDelivery = selectedHotel !== 'Table Order';
+        
+        let validationError = null;
+
+        if (isDelivery && (!selectedContact || selectedContact.length !== 10 || isNaN(selectedContact))) {
+            validationError = 'Please enter a valid 10-digit Contact Number for delivery!';
+        } else if (!isDelivery && !document.getElementById('tableNumber').value.trim()) {
+             // For dine-in, ensure the main tableNumber field has a value
+             validationError = 'Please enter your Table Number!';
+        }
+        
+        if (validationError) {
+            alert('Error: ' + validationError);
+            return;
+        }
+
+        // 1. Update main page hidden fields
+        document.getElementById('hotelName').value = selectedHotel;
+        // If it's a delivery, set the 'tableNumber' field to the selected Hostel Name
+        document.getElementById('tableNumber').value = isDelivery ? selectedHotel : ''; 
+        document.getElementById('contactNumber').value = isDelivery ? selectedContact : '';
+
+        // 2. Update button text and class
+        const btn = document.getElementById('setDeliveryLocationBtn');
+        if (isDelivery) {
+            btn.textContent = `Delivery: ${selectedHotel}`;
+            btn.classList.add('selected');
+        } else {
+            btn.textContent = 'Set Delivery Location';
+            btn.classList.remove('selected');
+        }
+
+        // 3. Sync and close modal
+        syncCustomerInfo();
+        toggleLocationModal();
+    }
+    
+    // --- Synchronization & UI Functions ---
+
+    function toggleContactInput() {
+        const hotelName = document.getElementById('hotelName').value;
+        const contactGroup = document.getElementById('contactGroupMain');
+        const tableRoomLabel = document.getElementById('tableRoomLabel');
+        const isDeliveryOrder = hotelName && hotelName !== 'Table Order';
+        const tableInput = document.getElementById('tableNumber');
+
+        if (isDeliveryOrder) {
+            contactGroup.classList.add('show');
+            tableRoomLabel.textContent = 'Hostel Name:'; // Change label for delivery
+            tableInput.placeholder = 'Hostel Name (Auto-set)';
+            // For delivery, the input should show the selected hostel and be disabled/readonly 
+            // The actual hostel name is in hotelName, but for simplicity we keep it in tableNumber to pass to API
+            tableInput.readOnly = true; 
+            tableInput.value = hotelName;
+        } else {
+            contactGroup.classList.remove('show');
+            tableRoomLabel.textContent = 'Table Number:'; // Change label back for dine-in
+            tableInput.placeholder = 'Enter Table Number';
+            tableInput.readOnly = false;
+        }
+        updateCartDisplay(); 
+    }
+
+    function toggleContactInputModal() {
+        const hotelNameModal = document.getElementById('hotelNameModal').value;
+        const contactGroupModal = document.getElementById('contactGroupModal');
+        const tableRoomLabelModal = document.getElementById('tableRoomLabelModal');
+        const isDeliveryOrder = hotelNameModal && hotelNameModal !== 'Table Order';
+
+        if (isDeliveryOrder) {
+            contactGroupModal.classList.add('show');
+            tableRoomLabelModal.textContent = 'Hostel Name:';
+        } else {
+            contactGroupModal.classList.remove('show');
+            tableRoomLabelModal.textContent = 'Table Number:';
+        }
+    }
+
+    function syncCustomerInfo() {
+      const hotel = document.getElementById('hotelName').value;
+      const table = document.getElementById('tableNumber').value;
+      const contact = document.getElementById('contactNumber').value;
+
+      // Sync Main Page inputs to Cart Modal hidden inputs (Source of Truth)
+      document.getElementById('hotelNameModal').value = hotel;
       document.getElementById('tableNumberModal').value = table;
+      document.getElementById('contactNumberModal').value = contact;
+      
+      // Sync Modal hidden inputs to Cart Modal display inputs (Readonly)
+      document.getElementById('locationDisplayInCart').value = hotel;
+      document.getElementById('tableNumberDisplayInCart').value = table;
+      document.getElementById('contactNumberDisplayInCart').value = contact;
+
+      // Re-apply visual updates based on new state
+      toggleContactInput(); // Update main contact/table visibility
+      toggleContactInputModal(); // Update modal contact/table visibility
+      updateCartDisplay();
     }
 
     function syncCustomerInfoFromModal() {
-      const name = document.getElementById('customerNameModal').value;
-      const table = document.getElementById('tableNumberModal').value;
+        // Function called to ensure UI reflects hidden values in cart modal
+        toggleContactInput(); 
+        toggleContactInputModal(); 
+        updateCartDisplay();
+    }
+    
+    document.getElementById('tableNumber').addEventListener('input', syncCustomerInfo);
+    document.getElementById('contactNumber').addEventListener('input', syncCustomerInfo);
 
-      document.getElementById('customerName').value = name;
-      document.getElementById('tableNumber').value = table;
+
+    
+    // --- Cart Display and Order Logic ---
+    
+    function updateCartDisplay() {
+      const cartItemsDiv = document.getElementById('cartItemsList');
+      const cartTotalDiv = document.getElementById('cartTotal');
+      const cartBadge = document.getElementById('cartBadge');
+      const deliveryRow = document.getElementById('deliveryChargeRow');
+      // Read from hidden modal fields (Source of Truth for Cart/Order logic)
+      const hotelName = document.getElementById('hotelNameModal').value;
+      
+      cartItemsDiv.innerHTML = '';
+      total = 0;
+      let totalItems = 0;
+
+      const isDeliveryOrder = hotelName && hotelName !== 'Table Order';
+      
+      for (let item in cart) {
+          const itemTotal = cart[item].price * cart[item].quantity;
+          total += itemTotal;
+          totalItems += cart[item].quantity;
+          
+          const cartItemDiv = document.createElement('div');
+          cartItemDiv.className = 'cart-item';
+          cartItemDiv.innerHTML = `
+            <span>${item} (₹${cart[item].price})</span>
+            <div class="quantity-controls">
+              <button class="quantity-btn" onclick="removeFromCart('${item}')">−</button>
+              <span>${cart[item].quantity}</span>
+              <button class="quantity-btn plus" onclick="increaseQuantity('${item}')">+</button>
+              <span>₹${itemTotal}</span>
+            </div>
+          `;
+          cartItemsDiv.appendChild(cartItemDiv);
+      }
+
+      let finalTotal = total;
+      if (isDeliveryOrder && totalItems > 0) {
+          deliveryRow.style.display = 'flex';
+          finalTotal += DELIVERY_CHARGE;
+      } else {
+          deliveryRow.style.display = 'none';
+      }
+
+      if (Object.keys(cart).length === 0) {
+        cartItemsDiv.innerHTML = `
+          <div class="empty-cart">
+            <div class="empty-cart-icon">🛒</div>
+            <p>Your cart is empty</p>
+            <p style="font-size: 0.9rem; margin-top: 5px;">Add items to get started!</p>
+          </div>
+        `;
+        cartBadge.textContent = '0';
+        deliveryRow.style.display = 'none'; 
+      } else {
+        cartBadge.textContent = totalItems;
+      }
+
+      cartTotalDiv.textContent = `Grand Total: ${finalTotal}`;
     }
 
-    document.getElementById('customerName').addEventListener('input', syncCustomerInfo);
-    document.getElementById('tableNumber').addEventListener('input', syncCustomerInfo);
 
-    document.getElementById('customerNameModal').addEventListener('input', syncCustomerInfoFromModal);
-    document.getElementById('tableNumberModal').addEventListener('input', syncCustomerInfoFromModal);
+    function toggleCart() {
+      const modal = document.getElementById('cartModal');
+      modal.classList.toggle('active');
+      if (modal.classList.contains('active')) {
+        syncCustomerInfo();
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    }
+    
+    function showStatusMessage(message, isError = false) {
+      const statusDiv = document.getElementById('statusMessage');
+      statusDiv.innerHTML = `<div class="status-message ${isError ? 'error' : 'success'}">${message}</div>`;
+      
+      setTimeout(() => {
+        statusDiv.innerHTML = '';
+      }, 5000);
+    }
 
-    // Search functionality
+
+    function sendSMS() {
+        syncCustomerInfoFromModal();
+        const hotelName = document.getElementById('hotelNameModal').value; // Hostel Name or "Table Order"
+        const tableNumber = document.getElementById('tableNumberModal').value.trim(); // Hostel Name or Table Number
+        const contactNumber = document.getElementById('contactNumberModal').value.trim();
+        const isDeliveryOrder = hotelName && hotelName !== 'Table Order';
+        
+        let validationError = null;
+
+        if (Object.keys(cart).length === 0) {
+            validationError = 'Please add items to cart!';
+        } else if (isDeliveryOrder && (!contactNumber || contactNumber.length !== 10 || isNaN(contactNumber))) {
+            validationError = 'Please enter a valid 10-digit Contact Number for delivery!';
+        } else if (hotelName === 'Table Order' && tableNumber.length < 1) {
+            validationError = 'Please enter your Table Number!';
+        }
+
+        if (validationError) {
+            showStatusMessage(validationError, true);
+            return;
+        }
+
+        const orderItems = Object.keys(cart).map(item => ({
+            name: item,
+            quantity: cart[item].quantity,
+            price: cart[item].price,
+            total: cart[item].price * cart[item].quantity
+        }));
+        
+        let orderTotal = orderItems.reduce((sum, item) => sum + item.total, 0);
+        
+        if (isDeliveryOrder) {
+            orderTotal += DELIVERY_CHARGE;
+            orderItems.push({
+                name: 'Delivery Charge',
+                quantity: 1,
+                price: DELIVERY_CHARGE,
+                total: DELIVERY_CHARGE
+            });
+        }
+
+        const newOrderData = {
+            customerName: hotelName,
+            tableNumber: tableNumber, // This now holds Hostel Name for delivery or Table No for dine-in
+            contactNumber: isDeliveryOrder ? contactNumber : 'N/A',
+            items: orderItems,
+            total: orderTotal,
+            type: isDeliveryOrder ? 'Delivery' : 'Dine-In',
+            confirmed: false, 
+            date: new Date().toLocaleDateString('en-GB'),
+            time: new Date().toLocaleTimeString(),
+            timestamp: Date.now()
+        };
+        
+        // This fetch call is for demonstration, assuming the API works.
+        fetch('https://mrt-cafe-api.onrender.com/api/orders', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newOrderData),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Server error while placing order.'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            showStatusMessage('✅ Order Placed Successfully! (Order ID: ' + data.orderNumber + ')');
+            
+            cart = {};
+            total = 0;
+            
+            // Reset customer info back to default
+            document.getElementById('hotelName').value = 'Table Order';
+            document.getElementById('tableNumber').value = '';
+            document.getElementById('contactNumber').value = '';
+            document.getElementById('setDeliveryLocationBtn').textContent = 'Set Delivery Location';
+            document.getElementById('setDeliveryLocationBtn').classList.remove('selected');
+            
+            updateCartDisplay();
+            syncCustomerInfo(); // Re-sync and update UI after reset
+            toggleCart();
+
+        })
+        .catch(error => {
+            console.error('Order Error:', error);
+            showStatusMessage('❌ Order failed: ' + error.message, true);
+        });
+    }
+
+    function downloadPDF() {
+      syncCustomerInfoFromModal();
+      const hotelName = document.getElementById('hotelNameModal').value;
+      const tableNumber = document.getElementById('tableNumberModal').value; // Hostel Name or Table Number
+      const contactNumber = document.getElementById('contactNumberModal').value;
+      const isDeliveryOrder = hotelName && hotelName !== 'Table Order';
+
+      if (Object.keys(cart).length === 0) {
+        showStatusMessage('Cart is empty! Please add items first.', true);
+        return;
+      }
+      
+      let validationError = null;
+      if (isDeliveryOrder && (!contactNumber || contactNumber.length !== 10 || isNaN(contactNumber))) {
+            validationError = 'Please enter a valid 10-digit Contact Number for delivery!';
+        } else if (hotelName === 'Table Order' && tableNumber.length < 1) {
+            validationError = 'Please enter your Table Number!';
+        }
+        
+        if (validationError) {
+            showStatusMessage(validationError, true);
+            return;
+        }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      let currentTotal = Object.values(cart).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      let finalTotal = currentTotal;
+      
+      const locationLabel = isDeliveryOrder ? 'Hostel Name' : 'Table Number';
+      const locationValue = tableNumber;
+
+      doc.setFontSize(20);
+      doc.setTextColor(40, 40, 40);
+      doc.text('MR.T Cafe - Food Order Bill', 105, 20, { align: 'center' });
+
+      doc.setFontSize(12);
+      doc.text(`Location Type: ${hotelName === 'Table Order' ? 'Dine-In' : 'For Delivery'}`, 20, 40);
+      doc.text(`${locationLabel}: ${locationValue}`, 20, 50);
+      
+      let currentY = 60;
+      if (isDeliveryOrder) {
+        doc.text(`Contact No.: ${contactNumber}`, 20, currentY);
+        currentY += 10;
+      }
+      
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, currentY + 10);
+      doc.text(`Time: ${new Date().toLocaleTimeString()}`, 20, currentY + 20);
+      
+      let startY = currentY + 30;
+
+      const tableData = [];
+      for (let item in cart) {
+        tableData.push([
+          item,
+          cart[item].quantity.toString(),
+          `${cart[item].price}`,
+          `${cart[item].price * cart[item].quantity}`
+        ]);
+      }
+      
+      if (isDeliveryOrder) {
+        tableData.push([
+          'Delivery Charge',
+          '1',
+          `${DELIVERY_CHARGE}`,
+          `${DELIVERY_CHARGE}`
+        ]);
+        finalTotal += DELIVERY_CHARGE;
+      }
+
+      doc.autoTable({
+        head: [['Item', 'Qty', 'Price', 'Total']],
+        body: tableData,
+        startY: startY,
+        theme: 'grid',
+        headStyles: { fillColor: [102, 126, 234] }
+      });
+
+      const finalY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text(`Grand Total: ${finalTotal}`, doc.internal.pageSize.width - 10, finalY, { align: 'right' });
+
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text('Thank you for your order!', 105, finalY + 20, { align: 'center' });
+
+      doc.save(`MRT_Cafe_Order_${hotelName}_${Date.now()}.pdf`);
+      showStatusMessage('✅ PDF downloaded successfully!');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('cartModal').addEventListener('click', function(e) {
+      if (e.target.id === 'cartModal') {
+        toggleCart();
+      }
+    });
+    
+    document.getElementById('locationModal').addEventListener('click', function(e) {
+      if (e.target.id === 'locationModal') {
+        toggleLocationModal();
+      }
+    });
+    
+    // Search functions (kept unchanged as they were working)
+    
     const searchInput = document.getElementById('searchInput');
     const clearSearchBtn = document.getElementById('clearSearch');
     const searchResultsInfo = document.getElementById('searchResultsInfo');
@@ -1414,7 +1738,6 @@
       let foundCount = 0;
       let searchResults = [];
 
-      // First pass: identify matches and collect them
       categories.forEach(category => {
         const categoryTitle = category.querySelector('h2').textContent.toLowerCase();
         const items = category.querySelectorAll('.item');
@@ -1423,14 +1746,12 @@
         items.forEach(item => {
           const itemName = item.querySelector('.item-name').textContent.toLowerCase();
           
-          // Check if search term matches item name OR category title
           if (itemName.includes(searchTerm) || categoryTitle.includes(searchTerm)) {
             item.classList.remove('hidden');
             item.classList.add('highlight');
             categoryHasMatch = true;
             foundCount++;
             
-            // Store both item and its original parent for reordering
             searchResults.push({
               item: item,
               category: category,
@@ -1450,11 +1771,8 @@
         }
       });
 
-      // Second pass: reorder categories and items to show matches on top
-      const mainContainer = document.querySelector('body');
       const searchContainer = document.querySelector('.search-container');
       
-      // Group results by category
       const resultsByCategory = {};
       searchResults.forEach(result => {
         const catTitle = result.categoryTitle;
@@ -1467,31 +1785,23 @@
         resultsByCategory[catTitle].items.push(result.item);
       });
 
-      // Move matching categories to top (after search box)
       const allCategories = Array.from(categories);
       const matchingCategories = [];
-      const nonMatchingCategories = [];
 
       allCategories.forEach(cat => {
         const catTitle = cat.querySelector('h2').textContent.toLowerCase();
         if (resultsByCategory[catTitle]) {
           matchingCategories.push(cat);
           
-          // Within each matching category, move matching items to top
-          const itemsContainer = cat;
           const h2 = cat.querySelector('h2');
           const matchingItems = resultsByCategory[catTitle].items;
           
           matchingItems.forEach(item => {
-            // Insert after h2
             h2.insertAdjacentElement('afterend', item);
           });
-        } else if (!cat.classList.contains('hidden')) {
-          nonMatchingCategories.push(cat);
         }
       });
 
-      // Reorder categories in DOM
       matchingCategories.forEach(cat => {
         searchContainer.insertAdjacentElement('afterend', cat);
       });
@@ -1510,10 +1820,6 @@
 
       const categories = document.querySelectorAll('.category');
       
-      // Store original order by getting all categories
-      const customerInfo = document.querySelector('.customer-info');
-      const searchContainer = document.querySelector('.search-container');
-      
       categories.forEach(category => {
         category.classList.remove('hidden');
         const items = category.querySelectorAll('.item');
@@ -1522,266 +1828,12 @@
         });
       });
 
-      // Restore original category order by re-appending them
       const categoriesArray = Array.from(categories);
       categoriesArray.forEach(cat => {
         document.body.appendChild(cat);
       });
     }
 
-    function toggleCart() {
-      const modal = document.getElementById('cartModal');
-      modal.classList.toggle('active');
-      if (modal.classList.contains('active')) {
-        syncCustomerInfo();
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = 'auto';
-      }
-    }
-
-    function showToast() {
-      const toast = document.getElementById('toast');
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
-
-    function playSound() {
-      try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 800;
-        oscillator.type = 'square';
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.1);
-      } catch (error) {
-        // Silently fail if audio context is not supported
-      }
-    }
-
-    function addToCart(itemName, price) {
-      playSound();
-      showToast();
-      
-      if (cart[itemName]) {
-        cart[itemName].quantity += 1;
-      } else {
-        cart[itemName] = { price: price, quantity: 1 };
-      }
-      updateCartDisplay();
-    }
-
-    function removeFromCart(itemName) {
-      if (cart[itemName] && cart[itemName].quantity > 1) {
-        cart[itemName].quantity -= 1;
-      } else {
-        delete cart[itemName];
-      }
-      updateCartDisplay();
-    }
-
-    function increaseQuantity(itemName) {
-      playSound();
-      if (cart[itemName]) {
-        cart[itemName].quantity += 1;
-        updateCartDisplay();
-      }
-    }
-
-    function updateCartDisplay() {
-      const cartItemsDiv = document.getElementById('cartItemsList');
-      const cartTotalDiv = document.getElementById('cartTotal');
-      const cartBadge = document.getElementById('cartBadge');
-      
-      cartItemsDiv.innerHTML = '';
-      total = 0;
-      let totalItems = 0;
-
-      if (Object.keys(cart).length === 0) {
-        cartItemsDiv.innerHTML = `
-          <div class="empty-cart">
-            <div class="empty-cart-icon">🛒</div>
-            <p>Your cart is empty</p>
-            <p style="font-size: 0.9rem; margin-top: 5px;">Add items to get started!</p>
-          </div>
-        `;
-        cartBadge.textContent = '0';
-      } else {
-        for (let item in cart) {
-          const itemTotal = cart[item].price * cart[item].quantity;
-          total += itemTotal;
-          totalItems += cart[item].quantity;
-
-          const cartItemDiv = document.createElement('div');
-          cartItemDiv.className = 'cart-item';
-          cartItemDiv.innerHTML = `
-            <span>${item} (₹${cart[item].price})</span>
-            <div class="quantity-controls">
-              <button class="quantity-btn" onclick="removeFromCart('${item}')">−</button>
-              <span>${cart[item].quantity}</span>
-              <button class="quantity-btn plus" onclick="increaseQuantity('${item}')">+</button>
-              <span>₹${itemTotal}</span>
-            </div>
-          `;
-          cartItemsDiv.appendChild(cartItemDiv);
-        }
-        cartBadge.textContent = totalItems;
-      }
-
-      cartTotalDiv.textContent = `Total: ₹${total}`;
-    }
-
-    function showStatusMessage(message, isError = false) {
-      const statusDiv = document.getElementById('statusMessage');
-      statusDiv.innerHTML = `<div class="status-message ${isError ? 'error' : 'success'}">${message}</div>`;
-      
-      setTimeout(() => {
-        statusDiv.innerHTML = '';
-      }, 5000);
-    }
-
-    // index.html mein sendSMS() function ko isse replace karein
-
-function sendSMS() {
-    syncCustomerInfoFromModal();
-    const customerName = document.getElementById('customerNameModal').value.trim();
-    const tableNumber = document.getElementById('tableNumberModal').value.trim();
-
-    if (!customerName || !tableNumber || Object.keys(cart).length === 0) {
-        showStatusMessage('Please fill all details and add items to cart!', true);
-        return;
-    }
-
-    // 1. Prepare data for API
-    const orderItems = Object.keys(cart).map(item => ({
-        name: item,
-        quantity: cart[item].quantity,
-        price: cart[item].price,
-        total: cart[item].price * cart[item].quantity
-    }));
-
-    const newOrderData = {
-        customerName: customerName,
-        tableNumber: tableNumber,
-        items: orderItems,
-        total: total,
-        confirmed: false, // Hamesha false rahega naye order ke liye
-        date: new Date().toLocaleDateString('en-GB'),
-        time: new Date().toLocaleTimeString(),
-        timestamp: Date.now()
-    };
-    
-    // 2. API Call to place the order (Yahan Local Storage hata denge)
-    fetch('https://mrt-cafe-api.onrender.com/api/orders', { 
-    method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newOrderData),
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Server error while placing order.');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Success
-        showStatusMessage('✅ Order Placed Successfully! (Order ID: ' + data.orderNumber + ')');
-        
-        // Cart ko khali karein
-        cart = {};
-        total = 0;
-        updateCartDisplay();
-        toggleCart();
-
-        // Agar aap chahte hain ki yeh order Local Storage mein bhi save ho customer ko dikhane ke liye, toh neeche ki lines use kar sakte hain.
-        // addOrderToHistory(customerName, tableNumber, orderItems, total); // Agar history Local Storage mein rakhni hai
-    })
-    .catch(error => {
-        console.error('Order Error:', error);
-        showStatusMessage('❌ Order failed: ' + error.message, true);
-    });
-}
-
-// NOTE: addOrderToHistory, loadOrders, saveOrders ki zaroorat sirf tab hai jab aap customer side par purane orders dikhana chahte hain. Warna, unhein 'index.html' se remove kar sakte hain.
-
-    function downloadPDF() {
-      syncCustomerInfoFromModal();
-      const customerName = document.getElementById('customerNameModal').value;
-      const tableNumber = document.getElementById('tableNumberModal').value;
-
-      if (!customerName || !tableNumber) {
-        showStatusMessage('Please fill in all customer details!', true);
-        return;
-      }
-
-      if (Object.keys(cart).length === 0) {
-        showStatusMessage('Cart is empty! Please add items first.', true);
-        return;
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      doc.setFontSize(20);
-      doc.setTextColor(40, 40, 40);
-      doc.text('MR.T Cafe - Food Order', 105, 20, { align: 'center' });
-
-      doc.setFontSize(12);
-      doc.text(`Customer Name: ${customerName}`, 20, 40);
-      doc.text(`Table Number: ${tableNumber}`, 20, 50);
-      doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 60);
-      doc.text(`Time: ${new Date().toLocaleTimeString()}`, 20, 70);
-
-      const tableData = [];
-      for (let item in cart) {
-        tableData.push([
-          item,
-          cart[item].quantity.toString(),
-          `₹${cart[item].price}`,
-          `₹${cart[item].price * cart[item].quantity}`
-        ]);
-      }
-
-      doc.autoTable({
-        head: [['Item', 'Qty', 'Price', 'Total']],
-        body: tableData,
-        startY: 80,
-        theme: 'grid',
-        headStyles: { fillColor: [102, 126, 234] }
-      });
-
-      const finalY = doc.lastAutoTable.finalY + 10;
-      doc.setFontSize(14);
-      doc.setFont(undefined, 'bold');
-      doc.text(`Grand Total: ₹${total}`, 105, finalY, { align: 'center' });
-
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
-      doc.text('Thank you for your order!', 105, finalY + 20, { align: 'center' });
-
-      doc.save(`MRT_Cafe_Order_${customerName}_${Date.now()}.pdf`);
-      showStatusMessage('✅ PDF downloaded successfully!');
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('cartModal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        toggleCart();
-      }
-    });
   </script>
 </body>
 </html>
