@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MR.T Cafe - Food Order</title>
   <style>
+    /* ... (CSS is unchanged) ... */
+
+    /* Global Styles */
     * {
       margin: 0;
       padding: 0;
@@ -50,6 +53,7 @@
       }
     }
 
+    /* Floating Cart Button */
     .cart-float-btn {
       position: fixed;
       top: 20px;
@@ -75,6 +79,7 @@
       box-shadow: 0 12px 32px rgba(102, 126, 234, 0.7);
     }
 
+
     .cart-badge {
       position: absolute;
       top: -5px;
@@ -92,6 +97,7 @@
       border: 2px solid white;
     }
 
+    /* Modals (Cart and Location) */
     .modal {
         display: none;
         position: fixed;
@@ -132,6 +138,7 @@
       }
     }
 
+
     .modal-header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
@@ -167,6 +174,7 @@
       transform: rotate(90deg);
     }
     
+    /* Location Modal Specific Styles */
     #locationModal .modal-content {
         max-width: 350px;
         padding: 20px;
@@ -223,6 +231,7 @@
         color: white;
     }
 
+    /* Cart Content Styles */
     .cart-body {
       padding: 20px;
     }
@@ -276,6 +285,7 @@
         display: none; 
     }
     
+    /* Cart Item Styles */
     .cart-items-list {
       margin: 20px 0;
       max-height: 300px;
@@ -364,6 +374,7 @@
       box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
     }
 
+    /* Main Page Customer Info Layout (Updated) */
     .customer-info {
         background: rgba(255, 255, 255, 0.95);
         padding: 20px;
@@ -384,6 +395,7 @@
         flex-shrink: 0;
     }
     
+    /* Input Container for Table/Room and Contact */
     .customer-details-container {
         display: flex;
         flex-grow: 1;
@@ -407,6 +419,7 @@
       background-color: white;
     }
     
+    /* New Button for Delivery Location */
     .delivery-location-btn {
         background: linear-gradient(135deg, #764ba2, #667eea);
         color: white;
@@ -425,10 +438,12 @@
         box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
     }
     
+    /* Highlight the delivery button if a hostel is selected */
     .delivery-location-btn.selected {
         background: linear-gradient(135deg, #28a745, #20c997);
     }
     
+    /* Contact Input visibility in main container */
     .mobile-input-group-main {
         transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
         overflow: hidden;
@@ -439,6 +454,8 @@
         max-height: 100px;
         opacity: 1;
     }
+    
+    /* --- Search & Menu Styles --- */
     
     .search-container {
       background: rgba(255, 255, 255, 0.95);
@@ -511,6 +528,7 @@
       animation: fadeInUp 1s ease-out 0.4s both;
     }
     
+    /* NEW: Styling for API fetched Categories */
     .category.new-category h2 {
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     }
@@ -654,6 +672,7 @@
       }
     }
 
+
     @media (max-width: 768px) {
       body {
         padding: 10px;
@@ -728,8 +747,9 @@
             <option value="Sushrut Hostel">Sushrut Hostel</option>
             <option value="Kalpuna Hostel">Kalpuna Hostel</option>
             <option value="Rani laxmi Bai Hostel">Rani laxmi Bai Hostel</option>
-        </select>
+            </select>
 
+        
         <label for="contactNumberLocation">Contact Number (10 digits):</label>
         <input type="tel" id="contactNumberLocation" placeholder="Contact Number (Mandatory for Delivery)" maxlength="10">
 
@@ -739,6 +759,7 @@
         </div>
     </div>
   </div>
+
 
   <div class="modal" id="cartModal">
     <div class="modal-content">
@@ -774,8 +795,7 @@
         
         <div class="delivery-charge-row" id="deliveryChargeRow">
             <span>Delivery Charge:</span>
-            <span>₹20</span>
-        </div>
+            <span>₹10</span> </div>
         
         <div class="cart-total" id="cartTotal">Grand Total: ₹0</div>
 
@@ -788,8 +808,11 @@
     </div>
   </div>
 
+  
+
   <h1>🍽️ MR.T Cafe</h1>
   <p class="tagline">A Taste of Home, Away from Home</p>
+  <p class="tagline"> Contect Number - 9696857466</p>
 
   <div class="customer-info">
     <button class="delivery-location-btn" id="setDeliveryLocationBtn" onclick="toggleLocationModal()">
@@ -857,27 +880,264 @@
   </div>
 
   <div class="category">
-    <h2>🍹 Mocktails</h2>
+    <h2>🹠Mocktails</h2>
     <div class="item"><span class="item-name">Virgin Mojito - ₹59</span><button onclick="addToCart('Virgin Mojito', 59)">Add</button></div>
     <div class="item"><span class="item-name">Blue Lagoon - ₹59</span><button onclick="addToCart('Blue Lagoon', 59)">Add</button></div>
     <div class="item"><span class="item-name">Kala Khatta - ₹59</span><button onclick="addToCart('Kala Khatta', 59)">Add</button></div>
+    <div class="item"><span class="item-name">Watermelon - ₹59</span><button onclick="addToCart('Watermelon', 59)">Add</button></div>
+    <div class="item"><span class="item-name">Tangy Mango - ₹59</span><button onclick="addToCart('Tangy Mango', 59)">Add</button></div>
+    <div class="item"><span class="item-name">Tamarind - ₹59</span><button onclick="addToCart('Tamarind', 59)">Add</button></div>
   </div>
 
+  <div class="category">
+    <h2>🥤 Soft Drinks</h2>
+    <div class="item"><span class="item-name">Water - ₹20</span><button onclick="addToCart('Water', 20)">Add</button></div>
+    <div class="item"><span class="item-name">Cold Drink - ₹20</span><button onclick="addToCart('Cold Drink', 20)">Add</button></div>
+    <div class="item"><span class="item-name">Masala Cold Drink - ₹35</span><button onclick="addToCart('Masala Drink', 35)">Add</button></div>
+    <div class="item"><span class="item-name">Masala Lemonade - ₹50</span><button onclick="addToCart('Masala Lemonade', 50)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🲠Soups</h2>
+    <div class="item"><span class="item-name">Sweet Corn Soup - ₹79</span><button onclick="addToCart('Sweet Corn Soup', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Hot & Sour Soup - ₹79</span><button onclick="addToCart('Hot & Sour Soup', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Veggie Soup - ₹79</span><button onclick="addToCart('Veggie Soup', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Manchow Soup - ₹99</span><button onclick="addToCart('Manchow Soup', 99)">Add</button></div>
+    <div class="item"><span class="item-name">Mex Chilli Beans - ₹99</span><button onclick="addToCart('Mex Chilli Beans', 99)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🜠Maggie</h2>
+    <div class="item"><span class="item-name">Veg Maggie - ₹55</span><button onclick="addToCart('Veg Maggie', 55)">Add</button></div>
+    <div class="item"><span class="item-name">Peri Peri Maggie - ₹69</span><button onclick="addToCart('Peri Peri Maggie', 69)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer Maggie - ₹79</span><button onclick="addToCart('Paneer Maggie', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Cheese Maggie - ₹99</span><button onclick="addToCart('Cheese Maggie', 99)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🥪 Sandwiches</h2>
+    <div class="item"><span class="item-name">Veg Sandwich - ₹75</span><button onclick="addToCart('Veg Sandwich', 75)">Add</button></div>
+    <div class="item"><span class="item-name">Cheese Veg - ₹89</span><button onclick="addToCart('Cheese Veg', 89)">Add</button></div>
+    <div class="item"><span class="item-name">Cheese Corn - ₹99</span><button onclick="addToCart('Cheese Corn', 99)">Add</button></div>
+    <div class="item"><span class="item-name">Cheese Paneer - ₹99</span><button onclick="addToCart('Cheese Paneer', 99)">Add</button></div>
+    <div class="item"><span class="item-name">Spicy Paneer - ₹89</span><button onclick="addToCart('Spicy Paneer', 89)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🥟 Momos</h2>
+    <div class="item"><span class="item-name">Steamed Veg - ₹55</span><button onclick="addToCart('Steamed Veg', 55)">Add</button></div>
+    <div class="item"><span class="item-name">Fried Veg - ₹69</span><button onclick="addToCart('Fried Veg', 69)">Add</button></div>
+    <div class="item"><span class="item-name">Tandoori Momos - ₹79</span><button onclick="addToCart('Tandoori Momos', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Kurkure Momos - ₹79</span><button onclick="addToCart('Kurkure Momos', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Peri Peri Momos - ₹79</span><button onclick="addToCart('Peri Peri Momos', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Veggie Crunch Roll - ₹55</span><button onclick="addToCart('Veggie Crunch Roll', 55)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍔 Burger</h2>
+    <div class="item"><span class="item-name">Veggie Burger - ₹59</span><button onclick="addToCart('Veggie Burger', 59)">Add</button></div>
+    <div class="item"><span class="item-name">Spicy Burger - ₹69</span><button onclick="addToCart('Spicy Burger', 69)">Add</button></div>
+    <div class="item"><span class="item-name">Tandoori Burger - ₹69</span><button onclick="addToCart('Tandoori Burger', 69)">Add</button></div>
+    <div class="item"><span class="item-name">Cheese Loaded - ₹89</span><button onclick="addToCart('Cheese Loaded', 89)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🌽 Corn</h2>
+    <div class="item"><span class="item-name">Sweet Corn - ₹69</span><button onclick="addToCart('Sweet Corn', 69)">Add</button></div>
+    <div class="item"><span class="item-name">Veggie Corn - ₹79</span><button onclick="addToCart('Veggie Corn', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Crispy Corn - ₹109</span><button onclick="addToCart('Crispy Corn', 109)">Add</button></div>
+    <div class="item"><span class="item-name">Vada pav - ₹40</span><button onclick="addToCart('Vada pav', 89)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍝 Pasta</h2>
+    <div class="item"><span class="item-name">White Sauce - ₹119</span><button onclick="addToCart('White Sauce', 119)">Add</button></div>
+    <div class="item"><span class="item-name">Red Sauce - ₹99</span><button onclick="addToCart('Red Sauce', 99)">Add</button></div>
+    <div class="item"><span class="item-name">Pink Sauce - ₹109</span><button onclick="addToCart('Pink Sauce', 109)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍟 Fries</h2>
+    <div class="item"><span class="item-name">Crunchy French Fries - ₹69</span><button onclick="addToCart('Crunchy French Fries', 69)">Add</button></div>
+    <div class="item"><span class="item-name">Peri Peri Fries - ₹79</span><button onclick="addToCart('Peri Peri Fries', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Cheese Fries - ₹89</span><button onclick="addToCart('Cheese Fries', 89)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍕 Pizza</h2>
+    <div class="item"><span class="item-name">Queen Margherita - ₹149</span><button onclick="addToCart('Queen Margherita', 149)">Add</button></div>
+    <div class="item"><span class="item-name">Double Topping - ₹159</span><button onclick="addToCart('Double Topping', 159)">Add</button></div>
+    <div class="item"><span class="item-name">Veggie Fresh - ₹179</span><button onclick="addToCart('Veggie Fresh', 179)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer Treat - ₹199</span><button onclick="addToCart('Paneer Treat', 199)">Add</button></div>
+    <div class="item"><span class="item-name">Farm Fresh - ₹249</span><button onclick="addToCart('Farm Fresh', 249)">Add</button></div>
+    <div class="item"><span class="item-name">Garlic Bread - ₹79</span><button onclick="addToCart('Garlic Bread', 79)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🌯 Wraps</h2>
+    <div class="item"><span class="item-name">Aalu Tikki Wrap - ₹79</span><button onclick="addToCart('Aalu Tikki Wrap', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Jalapeno Veggie - ₹79</span><button onclick="addToCart('Jalapeno Veggie', 79)">Add</button></div>
+    <div class="item"><span class="item-name">Tandoori Veggie - ₹89</span><button onclick="addToCart('Tandoori Veggie', 89)">Add</button></div>
+    <div class="item"><span class="item-name">Tandoori Paneer - ₹99</span><button onclick="addToCart('Tandoori Paneer', 99)">Add</button></div>
+    <div class="item"><span class="item-name">Cheese Veggie - ₹99</span><button onclick="addToCart('Cheese Veggie', 99)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🌅 Morning Masala</h2>
+    <div class="item"><span class="item-name">Samosa (2 Pcs) - ₹25</span><button onclick="addToCart('Samosa (2 Pcs)', 25)">Add</button></div>
+    <div class="item"><span class="item-name">2 Samosa with Chola - ₹35</span><button onclick="addToCart('2 Samosa with Chola', 35)">Add</button></div>
+    <div class="item"><span class="item-name">2 Khasta - ₹30</span><button onclick="addToCart('2 Khasta', 30)">Add</button></div>
+    <div class="item"><span class="item-name">Puri Sabji - ₹50</span><button onclick="addToCart('Puri Sabji', 50)">Add</button></div>
+    <div class="item"><span class="item-name">Chole Bhature - ₹60</span><button onclick="addToCart('Chole Bhature', 60)">Add</button></div>
+    <div class="item"><span class="item-name">Pav Bhaji - ₹80</span><button onclick="addToCart('Pav Bhaji', 80)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🫓 Parantha</h2>
+    <div class="item"><span class="item-name">Aalu Parantha - ₹50</span><button onclick="addToCart('Aalu Parantha', 50)">Add</button></div>
+    <div class="item"><span class="item-name">Pyaj Parantha - ₹60</span><button onclick="addToCart('Pyaj Parantha', 60)">Add</button></div>
+    <div class="item"><span class="item-name">Gobhi Parantha - ₹60</span><button onclick="addToCart('Gobhi Parantha', 60)">Add</button></div>
+    <div class="item"><span class="item-name">Mix Parantha - ₹70</span><button onclick="addToCart('Mix Parantha', 70)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer Parantha - ₹75</span><button onclick="addToCart('Paneer Parantha', 75)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🥘 Pakoda</h2>
+    <div class="item"><span class="item-name">Pyaj Pakoda - ₹69</span><button onclick="addToCart('Pyaj Pakoda', 69)">Add</button></div>
+    <div class="item"><span class="item-name">Mix Veg Pakoda - ₹60</span><button onclick="addToCart('Mix Veg Pakoda', 60)">Add</button></div>
+    <div class="item"><span class="item-name">Bread Pakoda - ₹20</span><button onclick="addToCart('Bread Pakoda', 20)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer Pakoda - ₹99</span><button onclick="addToCart('Paneer Pakoda', 99)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍛 Indian Khajana</h2>
+    <div class="item"><span class="item-name">Dal Tadka - ₹89</span><button onclick="addToCart('Dal Tadka', 89)">Add</button></div>
+    <div class="item"><span class="item-name">Dal Fry - ₹99</span><button onclick="addToCart('Dal Fry', 99)">Add</button></div>
+    <div class="item"><span class="item-name">Jerra Aalu - ₹99</span><button onclick="addToCart('Jerra Aalu', 99)">Add</button></div>
+    <div class="item"><span class="item-name">Chana Masala - ₹119</span><button onclick="addToCart('Chana Masala', 119)">Add</button></div>
+    <div class="item"><span class="item-name">Aalu Mushroom - ₹119</span><button onclick="addToCart('Aalu Mushroom', 119)">Add</button></div>
+    <div class="item"><span class="item-name">Rajma - ₹119</span><button onclick="addToCart('Rajma', 119)">Add</button></div>
+    <div class="item"><span class="item-name">Mix Veg - ₹129</span><button onclick="addToCart('Mix Veg', 129)">Add</button></div>
+    <div class="item"><span class="item-name">Matar Paneer - ₹149</span><button onclick="addToCart('Matar Paneer', 149)">Add</button></div>
+    <div class="item"><span class="item-name">Matar Mushroom - ₹159</span><button onclick="addToCart('Matar Mushroom', 159)">Add</button></div>
+    <div class="item"><span class="item-name">Kadhai Paneer - ₹169</span><button onclick="addToCart('Kadhai Paneer', 169)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer Do Pyaza - ₹169</span><button onclick="addToCart('Paneer Do Pyaza', 169)">Add</button></div>
+    <div class="item"><span class="item-name">Handi Paneer - ₹169</span><button onclick="addToCart('Handi Paneer', 169)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer Butter Masala - ₹179</span><button onclick="addToCart('Paneer Butter Masala', 179)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer Masala - ₹159</span><button onclick="addToCart('Paneer Masala', 159)">Add</button></div>
+    <div class="item"><span class="item-name">Shahi Paneer - ₹189</span><button onclick="addToCart('Shahi Paneer', 189)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍚 Rice</h2>
+    <div class="item"><span class="item-name">Plain Rice - ₹99</span><button onclick="addToCart('Plain Rice', 99)">Add</button></div>
+    <div class="item"><span class="item-name">Jeera Rice - ₹109</span><button onclick="addToCart('Jeera Rice', 109)">Add</button></div>
+    <div class="item"><span class="item-name">Butter Rice - ₹109</span><button onclick="addToCart('Butter Rice', 109)">Add</button></div>
+    <div class="item"><span class="item-name">Veg Pulao - ₹119</span><button onclick="addToCart('Veg Pulao', 119)">Add</button></div>
+    <div class="item"><span class="item-name">Veg Biryani - ₹129</span><button onclick="addToCart('Veg Biryani', 129)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍞 Bread</h2>
+    <div class="item"><span class="item-name">Tawa Roti - ₹10</span><button onclick="addToCart('Tawa Roti', 10)">Add</button></div>
+    <div class="item"><span class="item-name">Butter Roti - ₹15</span><button onclick="addToCart('Butter Roti', 15)">Add</button></div>
+    <div class="item"><span class="item-name">Puri - ₹15</span><button onclick="addToCart('Puri', 15)">Add</button></div>
+    <div class="item"><span class="item-name">Plain Parantha - ₹15</span><button onclick="addToCart('Plain Parantha', 15)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🥗 Salads & Raita</h2>
+    <div class="item"><span class="item-name">Green Salad - ₹59</span><button onclick="addToCart('Green Salad', 59)">Add</button></div>
+        <div class="item"><span class="item-name">Veg Raita - ₹49</span><button onclick="addToCart('Veg Raita', 49)">Add</button></div>
+        <div class="item"><span class="item-name">Boondi Raita - ₹49</span><button onclick="addToCart('Boondi Raita', 49)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍜 Noodles</h2>
+    <div class="item"><span class="item-name">Desi Noodles - ₹99</span><button onclick="addToCart('Desi Noodles', 99)">Add</button></div>
+    <div class="item"><span class="item-name">Veg Hakka Noodles - ₹129</span><button onclick="addToCart('Veg Hakka Noodles', 129)">Add</button></div>
+    <div class="item"><span class="item-name">Schezwan Noodles - ₹119</span><button onclick="addToCart('Schezwan Noodles', 119)">Add</button></div>
+    <div class="item"><span class="item-name">Chilli Garlic Noodles - ₹119</span><button onclick="addToCart('Chilli Garlic Noodles', 119)">Add</button></div>
+    <div class="item"><span class="item-name">Singapuria Noodles - ₹129</span><button onclick="addToCart('Singapuria Noodles', 129)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍚 Chinese Rice</h2>
+    <div class="item"><span class="item-name">Fried Rice - ₹109</span><button onclick="addToCart('Fried Rice', 109)">Add</button></div>
+    <div class="item"><span class="item-name">Chilli Garlic Rice - ₹119</span><button onclick="addToCart('Chilli Garlic Rice', 119)">Add</button></div>
+    <div class="item"><span class="item-name">Schezwan Fried Rice - ₹119</span><button onclick="addToCart('Schezwan Fried Rice', 119)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer Fried Rice - ₹129</span><button onclick="addToCart('Paneer Fried Rice', 129)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🌶️ Flavors of Kanpur</h2>
+    <div class="item"><span class="item-name">Chilli Potato - ₹109</span><button onclick="addToCart('Chilli Potato', 109)">Add</button></div>
+    <div class="item"><span class="item-name">Manchurian - ₹119</span><button onclick="addToCart('Manchurian', 119)">Add</button></div>
+    <div class="item"><span class="item-name">Honey Chilli Potato - ₹129</span><button onclick="addToCart('Honey Chilli Potato', 129)">Add</button></div>
+    <div class="item"><span class="item-name">Chilli Paneer - ₹139</span><button onclick="addToCart('Chilli Paneer', 139)">Add</button></div>
+    <div class="item"><span class="item-name">Kung Pao Paneer - ₹149</span><button onclick="addToCart('Kung Pao Paneer', 149)">Add</button></div>
+    <div class="item"><span class="item-name">Chinese bhel - ₹109</span><button onclick="addToCart('Chinese bhel', 109)">Add</button></div>
+    <div class="item"><span class="item-name">Gravy momos - ₹99</span><button onclick="addToCart('Gravy momos', 99)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍱 Rice Meal</h2>
+    <div class="item"><span class="item-name">Dal Rice - ₹89</span><button onclick="addToCart('Dal Rice', 89)">Add</button></div>
+    <div class="item"><span class="item-name">Chola Rice - ₹99</span><button onclick="addToCart('Chola Rice', 99)">Add</button></div>
+    <div class="item"><span class="item-name">Rajma Rice - ₹109</span><button onclick="addToCart('Rajma Rice', 109)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍽️ Thali</h2>
+    <div class="item"><span class="item-name">Eco Thali (4 Roti + Mix Veg + Dal + Rice + Salad) - ₹149</span><button onclick="addToCart('Eco Thali', 149)">Add</button></div>
+    <div class="item"><span class="item-name">Deluxe Thali (4 Roti + Paneer Sabji + Dal + Rice + Salad) - ₹179</span><button onclick="addToCart('Deluxe Thali', 179)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🍱 Eco Meal</h2>
+    <div class="item"><span class="item-name">4 Roti With Paneer of the Day + Salad - ₹109</span><button onclick="addToCart('4 Roti With Paneer + Salad', 109)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🥡 Chinese Combo</h2>
+    <div class="item"><span class="item-name">Noodles with Manchurian - ₹129</span><button onclick="addToCart('Noodles with Manchurian', 129)">Add</button></div>
+    <div class="item"><span class="item-name">Noodles with Chilli Paneer - ₹149</span><button onclick="addToCart('Noodles with Chilli Paneer', 149)">Add</button></div>
+    <div class="item"><span class="item-name">Fried Rice with Manchurian - ₹129</span><button onclick="addToCart('Fried Rice with Manchurian', 129)">Add</button></div>
+    <div class="item"><span class="item-name">Fried Rice with Chilli Paneer - ₹149</span><button onclick="addToCart('Fried Rice with Chilli Paneer', 149)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🥡 South Indian</h2>
+    <div class="item"><span class="item-name">Plain Dosa - ₹60</span><button onclick="addToCart('Plain Dosa', 60)">Add</button></div>
+    <div class="item"><span class="item-name">Masala Dosa -70</span><button onclick="addToCart('Masala Dosa', 70)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer masala dosa - ₹90</span><button onclick="addToCart('Paneer masala dosa', 90)">Add</button></div>
+    <div class="item"><span class="item-name">Paneer Dosa - ₹100</span><button onclick="addToCart('Paneer Dosa', 100)">Add</button></div>
+    <div class="item"><span class="item-name">Idli Smaha - ₹60</span><button onclick="addToCart('Idli Smaha', 60)">Add</button></div>
+  </div>
+
+
+  <div class="category">
+    <h2>🍰 Desserts</h2>
+    <div class="item"><span class="item-name">Ice Cream - ₹49</span><button onclick="addToCart('Ice Cream', 49)">Add</button></div>
+    <div class="item"><span class="item-name">Brownie - ₹75</span><button onclick="addToCart('Brownie', 75)">Add</button></div>
+    <div class="item"><span class="item-name">Brownie with Ice Cream - ₹99</span><button onclick="addToCart('Brownie with Ice Cream', 99)">Add</button></div>
+  </div>
   <div id="newMenuItemsContainer"></div>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   
   <script>
-    let cart = {};
+   let cart = {};
     let total = 0;
-    const DELIVERY_CHARGE = 20;
-    const MENU_API_URL = 'https://mrt-cafe-api.onrender.com/api/menu';
-    const API_BASE_URL = 'https://mrt-cafe-api.onrender.com/api/orders';
+    const DELIVERY_CHARGE = 10; // UPDATED: Delivery charge changed from 20 to 10
+    const MENU_API_URL = 'https://mrt-cafe-api.onrender.com/api/menu'; // Menu API Endpoint
     
+    // Global variable for AudioContext
     let audioContext;
     let audioReady = false;
     
+    // --- NEW: Function to Fetch and Render API Menu Items ---
     function fetchMenuDataAndRender() {
         fetch(MENU_API_URL)
             .then(response => {
@@ -891,6 +1151,8 @@
             })
             .catch(error => {
                 console.error('Error fetching dynamic menu:', error);
+                // Optionally show a message to the user
+                const container = document.getElementById('newMenuItemsContainer');
             });
     }
 
@@ -898,10 +1160,11 @@
         const container = document.getElementById('newMenuItemsContainer');
         container.innerHTML = '';
         
+        // Group items by category
         const categories = items.reduce((acc, item) => {
             if (!acc[item.category]) {
                 acc[item.category] = {
-                    emoji: item.emoji || '⭐',
+                    emoji: item.emoji || '⭐', // Use saved emoji or default
                     items: []
                 };
             }
@@ -909,10 +1172,12 @@
             return acc;
         }, {});
         
+        // Render each category group
         for (const catName in categories) {
             const catData = categories[catName];
             
             const categoryDiv = document.createElement('div');
+            // Add a special class to style dynamically added categories differently
             categoryDiv.className = 'category new-category'; 
             categoryDiv.innerHTML = `<h2>${catData.emoji} ${catName} (New)</h2>`;
             
@@ -929,10 +1194,14 @@
             container.appendChild(categoryDiv);
         }
     }
+    // --- END NEW FUNCTION ---
 
+
+    // Initialize AudioContext on user interaction
     function initAudioContext() {
         if (!audioReady) {
             try {
+                // Ensure context is running if it was suspended (e.g., on first click)
                 if (!audioContext) {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 }
@@ -940,22 +1209,27 @@
                     audioContext.resume();
                 }
                 audioReady = true;
+                // Once initialized/resumed, remove the listener
                 document.body.removeEventListener('click', initAudioContext, { once: true });
                 document.body.removeEventListener('touchend', initAudioContext, { once: true });
+                
             } catch (e) {
-                console.warn('Web Audio API not supported:', e);
+                console.warn('Web Audio API not supported or error during initialization:', e);
             }
         }
     }
 
+    // Attach listener for first click/tap to resume AudioContext
     document.addEventListener('DOMContentLoaded', function() {
         document.body.addEventListener('click', initAudioContext, { once: true });
         document.body.addEventListener('touchend', initAudioContext, { once: true });
         syncCustomerInfo(); 
-        fetchMenuDataAndRender();
+        fetchMenuDataAndRender(); // Fetch dynamic menu items on load
     });
 
+
     function playSound() {
+        // We only attempt to play sound if initialization has run
         if (audioReady && audioContext && audioContext.state === 'running') {
             try {
                 const oscillator = audioContext.createOscillator();
@@ -964,9 +1238,10 @@
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 
-                oscillator.frequency.value = 700;
+                oscillator.frequency.value = 700; // Slightly lower frequency for clear notification
                 oscillator.type = 'sine';
                 
+                // Quick attack and decay
                 gainNode.gain.setValueAtTime(0, audioContext.currentTime);
                 gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.01);
                 gainNode.gain.linearRampToValueAtTime(0.0001, audioContext.currentTime + 0.15);
@@ -974,23 +1249,26 @@
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.15);
             } catch (error) {
-                console.error("Audio error:", error);
+                console.error("Audio playback error:", error);
             }
         } else {
+            console.log("AudioContext not ready or running.");
+            // Try initializing one more time if a click occurred but context wasn't running
             initAudioContext();
         }
     }
 
     function showToast() {
       const toast = document.getElementById('toast');
-      toast.classList.remove('show');
-      void toast.offsetWidth;
+      toast.classList.remove('show'); // Reset animation
+      void toast.offsetWidth; // Trigger reflow
       toast.classList.add('show');
       setTimeout(() => {
         toast.classList.remove('show');
       }, 3000);
     }
 
+    // --- Core Add to Cart Function ---
     function addToCart(itemName, price) {
       playSound();
       showToast();
@@ -1002,6 +1280,7 @@
       }
       updateCartDisplay();
     }
+    // ---------------------------------
     
     function removeFromCart(itemName) {
       if (cart[itemName] && cart[itemName].quantity > 1) {
@@ -1020,6 +1299,8 @@
       }
     }
 
+
+    // --- Location Modal Logic ---
     function toggleLocationModal() {
         const modal = document.getElementById('locationModal');
 
@@ -1027,12 +1308,15 @@
             modal.classList.remove('active');
             document.body.style.overflow = 'auto';
         } else {
+            // Sync current main data to the modal controls when opening
             const currentHotel = document.getElementById('hotelName').value;
             const currentContact = document.getElementById('contactNumber').value;
+            // The tableNumber on the main page is repurposed to store the Hostel Name for delivery
             const currentTable = document.getElementById('tableNumber').value; 
 
             document.getElementById('hostelNameSelector').value = currentHotel;
             document.getElementById('contactNumberLocation').value = currentContact;
+            // Removed roomNumberLocation sync
             
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1049,6 +1333,7 @@
         if (isDelivery && (!selectedContact || selectedContact.length !== 10 || isNaN(selectedContact))) {
             validationError = 'Please enter a valid 10-digit Contact Number for delivery!';
         } else if (!isDelivery && !document.getElementById('tableNumber').value.trim()) {
+             // For dine-in, ensure the main tableNumber field has a value
              validationError = 'Please enter your Table Number!';
         }
         
@@ -1057,10 +1342,13 @@
             return;
         }
 
+        // 1. Update main page hidden fields
         document.getElementById('hotelName').value = selectedHotel;
+        // If it's a delivery, set the 'tableNumber' field to the selected Hostel Name
         document.getElementById('tableNumber').value = isDelivery ? selectedHotel : ''; 
         document.getElementById('contactNumber').value = isDelivery ? selectedContact : '';
 
+        // 2. Update button text and class
         const btn = document.getElementById('setDeliveryLocationBtn');
         if (isDelivery) {
             btn.textContent = `Delivery: ${selectedHotel}`;
@@ -1070,9 +1358,12 @@
             btn.classList.remove('selected');
         }
 
+        // 3. Sync and close modal
         syncCustomerInfo();
         toggleLocationModal();
     }
+    
+    // --- Synchronization & UI Functions ---
 
     function toggleContactInput() {
         const hotelName = document.getElementById('hotelName').value;
@@ -1083,13 +1374,15 @@
 
         if (isDeliveryOrder) {
             contactGroup.classList.add('show');
-            tableRoomLabel.textContent = 'Hostel Name:';
+            tableRoomLabel.textContent = 'Hostel Name:'; // Change label for delivery
             tableInput.placeholder = 'Hostel Name (Auto-set)';
+            // For delivery, the input should show the selected hostel and be disabled/readonly 
+            // The actual hostel name is in hotelName, but for simplicity we keep it in tableNumber to pass to API
             tableInput.readOnly = true; 
             tableInput.value = hotelName;
         } else {
             contactGroup.classList.remove('show');
-            tableRoomLabel.textContent = 'Table Number:';
+            tableRoomLabel.textContent = 'Table Number:'; // Change label back for dine-in
             tableInput.placeholder = 'Enter Table Number';
             tableInput.readOnly = false;
         }
@@ -1116,20 +1409,24 @@
       const table = document.getElementById('tableNumber').value;
       const contact = document.getElementById('contactNumber').value;
 
+      // Sync Main Page inputs to Cart Modal hidden inputs (Source of Truth)
       document.getElementById('hotelNameModal').value = hotel;
       document.getElementById('tableNumberModal').value = table;
       document.getElementById('contactNumberModal').value = contact;
       
+      // Sync Modal hidden inputs to Cart Modal display inputs (Readonly)
       document.getElementById('locationDisplayInCart').value = hotel;
       document.getElementById('tableNumberDisplayInCart').value = table;
       document.getElementById('contactNumberDisplayInCart').value = contact;
 
-      toggleContactInput();
-      toggleContactInputModal();
+      // Re-apply visual updates based on new state
+      toggleContactInput(); // Update main contact/table visibility
+      toggleContactInputModal(); // Update modal contact/table visibility
       updateCartDisplay();
     }
 
     function syncCustomerInfoFromModal() {
+        // Function called to ensure UI reflects hidden values in cart modal
         toggleContactInput(); 
         toggleContactInputModal(); 
         updateCartDisplay();
@@ -1137,12 +1434,17 @@
     
     document.getElementById('tableNumber').addEventListener('input', syncCustomerInfo);
     document.getElementById('contactNumber').addEventListener('input', syncCustomerInfo);
+
+
+    
+    // --- Cart Display and Order Logic ---
     
     function updateCartDisplay() {
       const cartItemsDiv = document.getElementById('cartItemsList');
       const cartTotalDiv = document.getElementById('cartTotal');
       const cartBadge = document.getElementById('cartBadge');
       const deliveryRow = document.getElementById('deliveryChargeRow');
+      // Read from hidden modal fields (Source of Truth for Cart/Order logic)
       const hotelName = document.getElementById('hotelNameModal').value;
       
       cartItemsDiv.innerHTML = '';
@@ -1192,8 +1494,9 @@
         cartBadge.textContent = totalItems;
       }
 
-      cartTotalDiv.textContent = `Grand Total: ₹${finalTotal}`;
+      cartTotalDiv.textContent = `Grand Total: ${finalTotal}`;
     }
+
 
     function toggleCart() {
       const modal = document.getElementById('cartModal');
@@ -1215,10 +1518,11 @@
       }, 5000);
     }
 
+
     function sendSMS() {
         syncCustomerInfoFromModal();
-        const hotelName = document.getElementById('hotelNameModal').value;
-        const tableNumber = document.getElementById('tableNumberModal').value.trim();
+        const hotelName = document.getElementById('hotelNameModal').value; // Hostel Name or "Table Order"
+        const tableNumber = document.getElementById('tableNumberModal').value.trim(); // Hostel Name or Table Number
         const contactNumber = document.getElementById('contactNumberModal').value.trim();
         const isDeliveryOrder = hotelName && hotelName !== 'Table Order';
         
@@ -1258,7 +1562,7 @@
 
         const newOrderData = {
             customerName: hotelName,
-            tableNumber: tableNumber,
+            tableNumber: tableNumber, // This now holds Hostel Name for delivery or Table No for dine-in
             contactNumber: isDeliveryOrder ? contactNumber : 'N/A',
             items: orderItems,
             total: orderTotal,
@@ -1266,11 +1570,11 @@
             confirmed: false, 
             date: new Date().toLocaleDateString('en-GB'),
             time: new Date().toLocaleTimeString(),
-            timestamp: Date.now(),
-            orderNumber: Math.floor(1000 + Math.random() * 9000)
+            timestamp: Date.now()
         };
         
-        fetch(API_BASE_URL, { 
+        // This fetch call is for demonstration, assuming the API works.
+        fetch('https://mrt-cafe-api.onrender.com/api/orders', { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1279,16 +1583,17 @@
         })
         .then(response => {
             if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.message || 'Server error'); });
+                return response.json().then(err => { throw new Error(err.message || 'Server error while placing order.'); });
             }
             return response.json();
         })
         .then(data => {
-            showStatusMessage('✅ Order Placed Successfully! (Order #' + data.orderNumber + ')');
+            showStatusMessage('✅ Order Placed Successfully! (Order ID: ' + data.orderNumber + ')');
             
             cart = {};
             total = 0;
             
+            // Reset customer info back to default
             document.getElementById('hotelName').value = 'Table Order';
             document.getElementById('tableNumber').value = '';
             document.getElementById('contactNumber').value = '';
@@ -1296,7 +1601,7 @@
             document.getElementById('setDeliveryLocationBtn').classList.remove('selected');
             
             updateCartDisplay();
-            syncCustomerInfo();
+            syncCustomerInfo(); // Re-sync and update UI after reset
             toggleCart();
 
         })
@@ -1309,7 +1614,7 @@
     function downloadPDF() {
       syncCustomerInfoFromModal();
       const hotelName = document.getElementById('hotelNameModal').value;
-      const tableNumber = document.getElementById('tableNumberModal').value;
+      const tableNumber = document.getElementById('tableNumberModal').value; // Hostel Name or Table Number
       const contactNumber = document.getElementById('contactNumberModal').value;
       const isDeliveryOrder = hotelName && hotelName !== 'Table Order';
 
@@ -1344,12 +1649,12 @@
       doc.text('MR.T Cafe - Food Order Bill', 105, 20, { align: 'center' });
 
       doc.setFontSize(12);
-      doc.text(`Location Type: ${hotelName === 'Table Order' ? 'Dine-In' : 'Delivery'}`, 20, 40);
+      doc.text(`Location Type: ${hotelName === 'Table Order' ? 'Dine-In' : 'For Delivery'}`, 20, 40);
       doc.text(`${locationLabel}: ${locationValue}`, 20, 50);
       
       let currentY = 60;
       if (isDeliveryOrder) {
-        doc.text(`Contact: ${contactNumber}`, 20, currentY);
+        doc.text(`Contact No.: ${contactNumber}`, 20, currentY);
         currentY += 10;
       }
       
@@ -1363,8 +1668,8 @@
         tableData.push([
           item,
           cart[item].quantity.toString(),
-          `₹${cart[item].price}`,
-          `₹${cart[item].price * cart[item].quantity}`
+          `${cart[item].price}`,
+          `${cart[item].price * cart[item].quantity}`
         ]);
       }
       
@@ -1372,8 +1677,8 @@
         tableData.push([
           'Delivery Charge',
           '1',
-          `₹${DELIVERY_CHARGE}`,
-          `₹${DELIVERY_CHARGE}`
+          `${DELIVERY_CHARGE}`,
+          `${DELIVERY_CHARGE}`
         ]);
         finalTotal += DELIVERY_CHARGE;
       }
@@ -1389,7 +1694,7 @@
       const finalY = doc.lastAutoTable.finalY + 10;
       doc.setFontSize(14);
       doc.setFont(undefined, 'bold');
-      doc.text(`Grand Total: ₹${finalTotal}`, doc.internal.pageSize.width - 10, finalY, { align: 'right' });
+      doc.text(`Grand Total: ${finalTotal}`, doc.internal.pageSize.width - 10, finalY, { align: 'right' });
 
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
@@ -1399,6 +1704,7 @@
       showStatusMessage('✅ PDF downloaded successfully!');
     }
 
+    // Close modal when clicking outside
     document.getElementById('cartModal').addEventListener('click', function(e) {
       if (e.target.id === 'cartModal') {
         toggleCart();
@@ -1410,6 +1716,8 @@
         toggleLocationModal();
       }
     });
+    
+    // Search functions (kept unchanged as they were working)
     
     const searchInput = document.getElementById('searchInput');
     const clearSearchBtn = document.getElementById('clearSearch');
@@ -1430,6 +1738,7 @@
     function performSearch(searchTerm) {
       const categories = document.querySelectorAll('.category');
       let foundCount = 0;
+      let searchResults = [];
 
       categories.forEach(category => {
         const categoryTitle = category.querySelector('h2').textContent.toLowerCase();
@@ -1444,6 +1753,13 @@
             item.classList.add('highlight');
             categoryHasMatch = true;
             foundCount++;
+            
+            searchResults.push({
+              item: item,
+              category: category,
+              categoryTitle: categoryTitle,
+              itemName: itemName
+            });
           } else {
             item.classList.add('hidden');
             item.classList.remove('highlight');
@@ -1455,6 +1771,41 @@
         } else {
           category.classList.add('hidden');
         }
+      });
+
+      const searchContainer = document.querySelector('.search-container');
+      
+      const resultsByCategory = {};
+      searchResults.forEach(result => {
+        const catTitle = result.categoryTitle;
+        if (!resultsByCategory[catTitle]) {
+          resultsByCategory[catTitle] = {
+            category: result.category,
+            items: []
+          };
+        }
+        resultsByCategory[catTitle].items.push(result.item);
+      });
+
+      const allCategories = Array.from(categories);
+      const matchingCategories = [];
+
+      allCategories.forEach(cat => {
+        const catTitle = cat.querySelector('h2').textContent.toLowerCase();
+        if (resultsByCategory[catTitle]) {
+          matchingCategories.push(cat);
+          
+          const h2 = cat.querySelector('h2');
+          const matchingItems = resultsByCategory[catTitle].items;
+          
+          matchingItems.forEach(item => {
+            h2.insertAdjacentElement('afterend', item);
+          });
+        }
+      });
+
+      matchingCategories.forEach(cat => {
+        searchContainer.insertAdjacentElement('afterend', cat);
       });
 
       if (foundCount > 0) {
@@ -1478,7 +1829,13 @@
           item.classList.remove('hidden', 'highlight');
         });
       });
+
+      const categoriesArray = Array.from(categories);
+      categoriesArray.forEach(cat => {
+        document.body.appendChild(cat);
+      });
     }
+
   </script>
 </body>
 </html>
