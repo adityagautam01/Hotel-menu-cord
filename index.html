@@ -5,6 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MR.T Cafe - Food Order</title>
   <style>
+
+
+
+/* Container ko center karne ke liye */
+.header-container {
+    text-align: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Link ko style karne ke liye */
+.cafe-link {
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none; /* Underline hatane ke liye */
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+/* Hover effect: jab mouse le jayein toh thoda bada dikhe */
+.cafe-link:hover {
+    transform: scale(1.05);
+    color: #f1f1f1;
+}
+
+.tagline {
+    color: #FFD700; /* Gold color jaisa image me hai */
+    font-style: italic;
+    margin-top: 10px;
+}
     /* ... (CSS is unchanged) ... */
 
     /* Global Styles */
@@ -809,8 +840,11 @@
   </div>
 
   
-
-  <h1>🍽️ MR.T Cafe</h1>
+<div class="header-container">
+    <a href="owner-dashboard.html" class="cafe-link">
+        <span class="icon">🍽️</span> MR.T Cafe
+    </a>
+</div>
   <p class="tagline">A Taste of Home, Away from Home</p>
   <p class="tagline"> Contect Number - 9696857466</p>
 
