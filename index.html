@@ -841,7 +841,7 @@
 
   
 <div class="header-container">
-    <a href="owner-dashboard.html" class="cafe-link">
+    <a href="owner-dashboard.html" class="cafe-link" id="backToowner-dashboard">
         <span class="icon">🍽️</span> MR.T Cafe
     </a>
 </div>
@@ -1547,9 +1547,10 @@
       const statusDiv = document.getElementById('statusMessage');
       statusDiv.innerHTML = `<div class="status-message ${isError ? 'error' : 'success'}">${message}</div>`;
       
-      setTimeout(() => {
-        statusDiv.innerHTML = '';
-      }, 5000);
+     // Har 5 second mein naye items check karne ke liye
+setInterval(() => {
+    fetchMenuDataAndRender();
+}, 5000);
     }
 
 
