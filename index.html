@@ -1803,6 +1803,13 @@
             });
         }
 
+        orderItems.push({
+            name: `Payment Mode: ${selectedPaymentMethod === 'upi' ? 'Online' : 'Cash'}`,
+            quantity: 1,
+            price: 0,
+            total: 0
+        });
+
         const newOrderData = {
             customerName: hotelName,
             tableNumber: tableNumber, // This now holds Hostel Name for delivery or Table No for dine-in
