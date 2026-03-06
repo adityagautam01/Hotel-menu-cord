@@ -377,6 +377,64 @@
       border-radius: 10px;
     }
 
+    .payment-methods {
+      margin-top: 16px;
+      padding: 16px;
+      background: #f8f9ff;
+      border: 1px solid #e6e9f5;
+      border-radius: 12px;
+    }
+
+    .payment-methods h3 {
+      font-size: 1rem;
+      color: #333;
+      margin-bottom: 12px;
+    }
+
+    .payment-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px;
+      border: 2px solid #d9deef;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .payment-option:hover {
+      border-color: #667eea;
+      transform: translateY(-1px);
+    }
+
+    .payment-option input {
+      accent-color: #667eea;
+      transform: scale(1.15);
+      cursor: pointer;
+    }
+
+    .payment-option.selected {
+      border-color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+      box-shadow: 0 8px 18px rgba(102, 126, 234, 0.12);
+    }
+
+    .payment-help {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: #666;
+      min-height: 20px;
+    }
+
     .action-buttons {
       display: flex;
       gap: 10px;
@@ -750,6 +808,10 @@
         right: 10px;
         left: 10px;
       }
+
+      .payment-options {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -830,6 +892,21 @@
         
         <div class="cart-total" id="cartTotal">Grand Total: ₹0</div>
 
+        <div class="payment-methods">
+          <h3>Select Payment Method</h3>
+          <div class="payment-options">
+            <label class="payment-option" id="cashOption">
+              <input type="radio" name="paymentMethod" value="cash" onchange="handlePaymentMethodChange('cash')">
+              <span>Cash</span>
+            </label>
+            <label class="payment-option" id="upiOption">
+              <input type="radio" name="paymentMethod" value="upi" onchange="handlePaymentMethodChange('upi')">
+              <span>Online / UPI</span>
+            </label>
+          </div>
+          <div class="payment-help" id="paymentHelp">Choose one option before placing the order.</div>
+        </div>
+
         <div class="action-buttons">
           <button class="send-btn" onclick="sendSMS()">✅ PLACE ORDER</button>
           <button class="pdf-btn" onclick="downloadPDF()">🧾 Download Bill</button>
@@ -876,14 +953,6 @@
     </div>
     <div class="search-results-info" id="searchResultsInfo"></div>
   </div>
-
-  <div class="category">
-    <h2>🥤 Soft Drinks</h2>
-    <div class="item"><span class="item-name">Water - ₹20</span><button onclick="addToCart('Water', 20)">Add</button></div>
-    <div class="item"><span class="item-name">Cold Drink - ₹20</span><button onclick="addToCart('Cold Drink', 20)">Add</button></div>
-    <div class="item"><span class="item-name">Masala Cold Drink - ₹35</span><button onclick="addToCart('Masala Drink', 35)">Add</button></div>
-    <div class="item"><span class="item-name">Masala Lemonade - ₹50</span><button onclick="addToCart('Masala Lemonade', 50)">Add</button></div>
-  </div>
   
   <div class="category">
     <h2>☕ Chai Shai</h2>
@@ -929,6 +998,14 @@
     <div class="item"><span class="item-name">Watermelon - ₹59</span><button onclick="addToCart('Watermelon', 59)">Add</button></div>
     <div class="item"><span class="item-name">Tangy Mango - ₹59</span><button onclick="addToCart('Tangy Mango', 59)">Add</button></div>
     <div class="item"><span class="item-name">Tamarind - ₹59</span><button onclick="addToCart('Tamarind', 59)">Add</button></div>
+  </div>
+
+  <div class="category">
+    <h2>🥤 Soft Drinks</h2>
+    <div class="item"><span class="item-name">Water - ₹20</span><button onclick="addToCart('Water', 20)">Add</button></div>
+    <div class="item"><span class="item-name">Cold Drink - ₹20</span><button onclick="addToCart('Cold Drink', 20)">Add</button></div>
+    <div class="item"><span class="item-name">Masala Cold Drink - ₹35</span><button onclick="addToCart('Masala Drink', 35)">Add</button></div>
+    <div class="item"><span class="item-name">Masala Lemonade - ₹50</span><button onclick="addToCart('Masala Lemonade', 50)">Add</button></div>
   </div>
 
   <div class="category">
@@ -1166,10 +1243,17 @@
     let total = 0;
     const DELIVERY_CHARGE = 10; // UPDATED: Delivery charge changed from 20 to 10
     const MENU_API_URL = 'https://mrt-cafe-api.onrender.com/api/menu'; // Menu API Endpoint
+    const ORDERS_API_URL = 'https://mrt-cafe-api.onrender.com/api/orders';
+    const UPI_PAYEE_ID = 'your-upi-id@upi';
+    const UPI_PAYEE_NAME = 'MR.T Cafe';
+    const MENU_REFRESH_INTERVAL = 5000;
     
     // Global variable for AudioContext
     let audioContext;
     let audioReady = false;
+    let selectedPaymentMethod = '';
+    let upiPaymentInitiated = false;
+    let menuRefreshStarted = false;
     
     // --- NEW: Function to Fetch and Render API Menu Items ---
     function fetchMenuDataAndRender() {
@@ -1188,6 +1272,17 @@
                 // Optionally show a message to the user
                 const container = document.getElementById('newMenuItemsContainer');
             });
+    }
+
+    function startMenuRefresh() {
+        if (menuRefreshStarted) {
+            return;
+        }
+
+        menuRefreshStarted = true;
+        setInterval(() => {
+            fetchMenuDataAndRender();
+        }, MENU_REFRESH_INTERVAL);
     }
 
     function renderNewMenuItems(items) {
@@ -1258,7 +1353,9 @@
         document.body.addEventListener('click', initAudioContext, { once: true });
         document.body.addEventListener('touchend', initAudioContext, { once: true });
         syncCustomerInfo(); 
+        resetPaymentSelection();
         fetchMenuDataAndRender(); // Fetch dynamic menu items on load
+        startMenuRefresh();
     });
 
 
@@ -1465,6 +1562,122 @@
         toggleContactInputModal(); 
         updateCartDisplay();
     }
+
+    function getOrderTotal(isDeliveryOrder) {
+        let orderTotal = Object.keys(cart).reduce((sum, item) => {
+            return sum + (cart[item].price * cart[item].quantity);
+        }, 0);
+
+        if (isDeliveryOrder && Object.keys(cart).length > 0) {
+            orderTotal += DELIVERY_CHARGE;
+        }
+
+        return orderTotal;
+    }
+
+    function setPaymentHelp(message, isError = false) {
+        const help = document.getElementById('paymentHelp');
+        help.textContent = message;
+        help.style.color = isError ? '#dc3545' : '#666';
+    }
+
+    function updatePaymentSelectionUI() {
+        document.getElementById('cashOption').classList.toggle('selected', selectedPaymentMethod === 'cash');
+        document.getElementById('upiOption').classList.toggle('selected', selectedPaymentMethod === 'upi');
+    }
+
+    function resetPaymentSelection() {
+        selectedPaymentMethod = '';
+        upiPaymentInitiated = false;
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+            input.checked = false;
+        });
+        updatePaymentSelectionUI();
+        setPaymentHelp('Choose one option before placing the order.');
+    }
+
+    function validateOrderInputs() {
+        const hotelName = document.getElementById('hotelNameModal').value;
+        const tableNumber = document.getElementById('tableNumberModal').value.trim();
+        const contactNumber = document.getElementById('contactNumberModal').value.trim();
+        const isDeliveryOrder = hotelName && hotelName !== 'Table Order';
+
+        if (Object.keys(cart).length === 0) {
+            return { error: 'Please add items to cart!' };
+        }
+
+        if (isDeliveryOrder && (!contactNumber || contactNumber.length !== 10 || isNaN(contactNumber))) {
+            return { error: 'Please enter a valid 10-digit Contact Number for delivery!' };
+        }
+
+        if (hotelName === 'Table Order' && tableNumber.length < 1) {
+            return { error: 'Please enter your Table Number!' };
+        }
+
+        if (!selectedPaymentMethod) {
+            return { error: 'Please select Cash or Online payment method.' };
+        }
+
+        return {
+            hotelName,
+            tableNumber,
+            contactNumber,
+            isDeliveryOrder,
+            finalTotal: getOrderTotal(isDeliveryOrder)
+        };
+    }
+
+    function openUpiPayment(amount) {
+        upiPaymentInitiated = true;
+        const note = encodeURIComponent('MR.T Cafe Order Payment');
+        const upiUrl = `upi://pay?pa=${encodeURIComponent(UPI_PAYEE_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${amount}&cu=INR&tn=${note}`;
+
+        setPaymentHelp(`UPI app opened for Rs.${amount}. Payment ke baad PLACE ORDER dabaiye.`);
+
+        const upiWindow = window.open(upiUrl, '_self');
+        if (!upiWindow) {
+            window.location.href = upiUrl;
+        }
+    }
+
+    function handlePaymentMethodChange(method) {
+        selectedPaymentMethod = method;
+        if (method !== 'upi') {
+            upiPaymentInitiated = false;
+        }
+
+        updatePaymentSelectionUI();
+
+        if (method === 'cash') {
+            setPaymentHelp('Cash selected. The order will be placed directly.');
+            return;
+        }
+
+        const validation = validateOrderInputs();
+        if (validation.error) {
+            selectedPaymentMethod = '';
+            document.querySelector('input[name="paymentMethod"][value="upi"]').checked = false;
+            updatePaymentSelectionUI();
+            setPaymentHelp(validation.error, true);
+            showStatusMessage(validation.error, true);
+            return;
+        }
+
+        openUpiPayment(validation.finalTotal);
+    }
+
+    function resetOrderForm() {
+        cart = {};
+        total = 0;
+        document.getElementById('hotelName').value = 'Table Order';
+        document.getElementById('tableNumber').value = '';
+        document.getElementById('contactNumber').value = '';
+        document.getElementById('setDeliveryLocationBtn').textContent = 'Set Delivery Location';
+        document.getElementById('setDeliveryLocationBtn').classList.remove('selected');
+        resetPaymentSelection();
+        updateCartDisplay();
+        syncCustomerInfo();
+    }
     
     document.getElementById('tableNumber').addEventListener('input', syncCustomerInfo);
     document.getElementById('contactNumber').addEventListener('input', syncCustomerInfo);
@@ -1528,7 +1741,12 @@
         cartBadge.textContent = totalItems;
       }
 
-      cartTotalDiv.textContent = `Grand Total: ${finalTotal}`;
+      cartTotalDiv.textContent = `Grand Total: Rs.${finalTotal}`;
+
+      if (selectedPaymentMethod === 'upi' && upiPaymentInitiated) {
+          upiPaymentInitiated = false;
+          setPaymentHelp('Cart amount changed. UPI amount update ho gaya hai, please UPI option dubara select karein.');
+      }
     }
 
 
@@ -1546,33 +1764,23 @@
     function showStatusMessage(message, isError = false) {
       const statusDiv = document.getElementById('statusMessage');
       statusDiv.innerHTML = `<div class="status-message ${isError ? 'error' : 'success'}">${message}</div>`;
-      
-     // Har 5 second mein naye items check karne ke liye
-setInterval(() => {
-    fetchMenuDataAndRender();
-}, 5000);
     }
 
 
     function sendSMS() {
         syncCustomerInfoFromModal();
-        const hotelName = document.getElementById('hotelNameModal').value; // Hostel Name or "Table Order"
-        const tableNumber = document.getElementById('tableNumberModal').value.trim(); // Hostel Name or Table Number
-        const contactNumber = document.getElementById('contactNumberModal').value.trim();
-        const isDeliveryOrder = hotelName && hotelName !== 'Table Order';
-        
-        let validationError = null;
-
-        if (Object.keys(cart).length === 0) {
-            validationError = 'Please add items to cart!';
-        } else if (isDeliveryOrder && (!contactNumber || contactNumber.length !== 10 || isNaN(contactNumber))) {
-            validationError = 'Please enter a valid 10-digit Contact Number for delivery!';
-        } else if (hotelName === 'Table Order' && tableNumber.length < 1) {
-            validationError = 'Please enter your Table Number!';
+        const validation = validateOrderInputs();
+        if (validation.error) {
+            showStatusMessage(validation.error, true);
+            return;
         }
 
-        if (validationError) {
-            showStatusMessage(validationError, true);
+        const { hotelName, tableNumber, contactNumber, isDeliveryOrder } = validation;
+
+        if (selectedPaymentMethod === 'upi' && !upiPaymentInitiated) {
+            const message = 'Pehle UPI option choose karke payment app open kijiye, phir payment ke baad PLACE ORDER dabaiye.';
+            showStatusMessage(message, true);
+            setPaymentHelp(message, true);
             return;
         }
 
@@ -1602,14 +1810,18 @@ setInterval(() => {
             items: orderItems,
             total: orderTotal,
             type: isDeliveryOrder ? 'Delivery' : 'Dine-In',
-            confirmed: false, 
+            paymentMethod: selectedPaymentMethod === 'upi' ? 'Online' : 'Cash',
+            paymentType: selectedPaymentMethod === 'upi' ? 'Online' : 'Cash',
+            paymentMode: selectedPaymentMethod === 'upi' ? 'Online' : 'Cash',
+            paymentStatus: selectedPaymentMethod === 'upi' ? 'Paid via UPI' : 'Cash on Delivery/Counter',
+            confirmed: selectedPaymentMethod === 'upi', 
             date: new Date().toLocaleDateString('en-GB'),
             time: new Date().toLocaleTimeString(),
             timestamp: Date.now()
         };
         
         // This fetch call is for demonstration, assuming the API works.
-        fetch('https://mrt-cafe-api.onrender.com/api/orders', { 
+        fetch(ORDERS_API_URL, { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1625,18 +1837,7 @@ setInterval(() => {
         .then(data => {
             showStatusMessage('✅ Order Placed Successfully! (Order ID: ' + data.orderNumber + ')');
             
-            cart = {};
-            total = 0;
-            
-            // Reset customer info back to default
-            document.getElementById('hotelName').value = 'Table Order';
-            document.getElementById('tableNumber').value = '';
-            document.getElementById('contactNumber').value = '';
-            document.getElementById('setDeliveryLocationBtn').textContent = 'Set Delivery Location';
-            document.getElementById('setDeliveryLocationBtn').classList.remove('selected');
-            
-            updateCartDisplay();
-            syncCustomerInfo(); // Re-sync and update UI after reset
+            resetOrderForm();
             toggleCart();
 
         })
@@ -1874,4 +2075,3 @@ setInterval(() => {
   </script>
 </body>
 </html>
-
