@@ -1244,7 +1244,7 @@
     const DELIVERY_CHARGE = 10; // UPDATED: Delivery charge changed from 20 to 10
     const MENU_API_URL = 'https://mrt-cafe-api.onrender.com/api/menu'; // Menu API Endpoint
     const ORDERS_API_URL = 'https://mrt-cafe-api.onrender.com/api/orders';
-    const UPI_PAYEE_ID = 'your-upi-id@upi';
+    const UPI_PAYEE_ID = '6387166447@ptyes';
     const UPI_PAYEE_NAME = 'MR.T Cafe';
     const MENU_REFRESH_INTERVAL = 5000;
     
@@ -1628,16 +1628,27 @@
     }
 
     function openUpiPayment(amount) {
+        if (!UPI_PAYEE_ID || UPI_PAYEE_ID === 'your-upi-id@upi') {
+            const message = 'UPI ID abhi set nahi hai. Pehle code me asli UPI ID daalni padegi.';
+            upiPaymentInitiated = false;
+            setPaymentHelp(message, true);
+            showStatusMessage(message, true);
+            return;
+        }
+
         upiPaymentInitiated = true;
         const note = encodeURIComponent('MR.T Cafe Order Payment');
         const upiUrl = `upi://pay?pa=${encodeURIComponent(UPI_PAYEE_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${amount}&cu=INR&tn=${note}`;
+        const intentUrl = `intent://pay?pa=${encodeURIComponent(UPI_PAYEE_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${amount}&cu=INR&tn=${note}#Intent;scheme=upi;end`;
 
         setPaymentHelp(`UPI app opened for Rs.${amount}. Payment ke baad PLACE ORDER dabaiye.`);
+        window.location.href = upiUrl;
 
-        const upiWindow = window.open(upiUrl, '_self');
-        if (!upiWindow) {
-            window.location.href = upiUrl;
-        }
+        setTimeout(() => {
+            if (document.visibilityState === 'visible') {
+                window.location.href = intentUrl;
+            }
+        }, 700);
     }
 
     function handlePaymentMethodChange(method) {
