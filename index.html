@@ -435,80 +435,6 @@
       min-height: 20px;
     }
 
-    .upi-payment-box {
-      display: none;
-      margin-top: 14px;
-      padding: 16px;
-      border-radius: 14px;
-      background: white;
-      border: 1px solid #d9deef;
-    }
-
-    .upi-payment-box.show {
-      display: block;
-    }
-
-    .upi-payment-box h4 {
-      margin-bottom: 12px;
-      color: #333;
-      font-size: 0.98rem;
-    }
-
-    .upi-qr-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 14px;
-    }
-
-    .upi-qr-wrap img {
-      width: 180px;
-      height: 180px;
-      border-radius: 12px;
-      border: 1px solid #e2e5f1;
-      background: #fff;
-      object-fit: cover;
-    }
-
-    .upi-meta-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid #eef1f8;
-      font-size: 0.95rem;
-    }
-
-    .upi-meta-row:last-of-type {
-      border-bottom: none;
-    }
-
-    .upi-meta-row strong {
-      color: #2d3642;
-    }
-
-    .upi-actions {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .upi-actions button {
-      border: none;
-      border-radius: 10px;
-      padding: 12px;
-      cursor: pointer;
-      font-weight: bold;
-      color: white;
-    }
-
-    .upi-open-btn {
-      background: linear-gradient(135deg, #1f8a48, #2cb14d);
-    }
-
-    .upi-copy-btn {
-      background: linear-gradient(135deg, #667eea, #6f59da);
-    }
 
     .action-buttons {
       display: flex;
@@ -888,9 +814,6 @@
         grid-template-columns: 1fr;
       }
 
-      .upi-actions {
-        grid-template-columns: 1fr;
-      }
     }
   </style>
 </head>
@@ -984,24 +907,6 @@
             </label>
           </div>
           <div class="payment-help" id="paymentHelp">Choose one option before placing the order.</div>
-          <div class="upi-payment-box" id="upiPaymentBox">
-            <h4>Online Payment</h4>
-            <div class="upi-qr-wrap">
-              <img id="upiQrImage" alt="UPI QR Code">
-            </div>
-            <div class="upi-meta-row">
-              <span>UPI ID</span>
-              <strong id="upiIdText"></strong>
-            </div>
-            <div class="upi-meta-row">
-              <span>Amount</span>
-              <strong id="upiAmountText"></strong>
-            </div>
-            <div class="upi-actions">
-              <button class="upi-open-btn" type="button" onclick="openUpiPaymentFromButton()">Open UPI App</button>
-              <button class="upi-copy-btn" type="button" onclick="copyUpiDetails()">Copy UPI ID</button>
-            </div>
-          </div>
         </div>
 
         <div class="action-buttons">
@@ -1683,33 +1588,6 @@
         return `upi://pay?pa=${encodeURIComponent(UPI_PAYEE_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${amount}&cu=INR&tn=${note}`;
     }
 
-    function hideUpiBox() {
-        document.getElementById('upiPaymentBox').classList.remove('show');
-    }
-
-    function renderUpiPaymentBox(amount) {
-        const upiBox = document.getElementById('upiPaymentBox');
-        const upiUrl = buildUpiUrl(amount);
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(upiUrl)}`;
-
-        document.getElementById('upiQrImage').src = qrUrl;
-        document.getElementById('upiIdText').textContent = UPI_PAYEE_ID;
-        document.getElementById('upiAmountText').textContent = `Rs.${amount}`;
-        upiBox.dataset.amount = String(amount);
-        upiBox.classList.add('show');
-    }
-
-    async function copyUpiDetails() {
-        try {
-            await navigator.clipboard.writeText(UPI_PAYEE_ID);
-            setPaymentHelp('UPI ID copied. Kisi bhi UPI app me paste karke payment kar sakte hain.');
-            showStatusMessage('UPI ID copied successfully.');
-        } catch (error) {
-            setPaymentHelp('UPI ID copy nahi ho payi. Manually note kar lijiye.', true);
-            showStatusMessage('UPI ID copy failed.', true);
-        }
-    }
-
     function updatePaymentSelectionUI() {
         document.getElementById('cashOption').classList.toggle('selected', selectedPaymentMethod === 'cash');
         document.getElementById('upiOption').classList.toggle('selected', selectedPaymentMethod === 'upi');
@@ -1722,7 +1600,6 @@
             input.checked = false;
         });
         updatePaymentSelectionUI();
-        hideUpiBox();
         setPaymentHelp('Choose one option before placing the order.');
     }
 
@@ -1780,16 +1657,6 @@
         }, 700);
     }
 
-    function openUpiPaymentFromButton() {
-        const upiBox = document.getElementById('upiPaymentBox');
-        const amount = Number(upiBox.dataset.amount || '0');
-        if (!amount) {
-            setPaymentHelp('Amount missing hai. Please UPI option dubara select karein.', true);
-            return;
-        }
-        openUpiPayment(amount);
-    }
-
     function handlePaymentMethodChange(method) {
         selectedPaymentMethod = method;
         if (method !== 'upi') {
@@ -1799,7 +1666,6 @@
         updatePaymentSelectionUI();
 
         if (method === 'cash') {
-            hideUpiBox();
             setPaymentHelp('Cash selected. The order will be placed directly.');
             return;
         }
@@ -1814,8 +1680,7 @@
             return;
         }
 
-        renderUpiPaymentBox(validation.finalTotal);
-        setPaymentHelp(`QR scan karein ya Open UPI App button use karein. Payment ke baad PLACE ORDER dabaiye.`);
+        openUpiPayment(validation.finalTotal);
     }
 
     function resetOrderForm() {
@@ -1895,12 +1760,9 @@
 
       cartTotalDiv.textContent = `Grand Total: Rs.${finalTotal}`;
 
-      if (selectedPaymentMethod === 'upi') {
-          renderUpiPaymentBox(finalTotal);
-          if (upiPaymentInitiated) {
-              upiPaymentInitiated = false;
-              setPaymentHelp('Cart amount changed. QR aur amount update ho gaya hai. Payment se pehle amount verify kar lein.');
-          }
+      if (selectedPaymentMethod === 'upi' && upiPaymentInitiated) {
+          upiPaymentInitiated = false;
+          setPaymentHelp('Cart amount changed. UPI amount update ho gaya hai, please UPI option dubara select karein.');
       }
     }
 
