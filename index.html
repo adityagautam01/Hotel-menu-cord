@@ -1702,6 +1702,24 @@
             prefill: {
                 contact: orderPayload.contactNumber !== 'N/A' ? orderPayload.contactNumber : ''
             },
+            config: {
+                display: {
+                    blocks: {
+                        upi: {
+                            name: 'Pay by UPI',
+                            instruments: [
+                                {
+                                    method: 'upi'
+                                }
+                            ]
+                        }
+                    },
+                    sequence: ['block.upi'],
+                    preferences: {
+                        show_default_blocks: false
+                    }
+                }
+            },
             theme: {
                 color: '#667eea'
             },
