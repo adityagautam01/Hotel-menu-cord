@@ -435,39 +435,6 @@
       min-height: 20px;
     }
 
-    .upi-platforms {
-      display: none;
-      margin-top: 12px;
-      gap: 10px;
-      grid-template-columns: 1fr;
-    }
-
-    .upi-platforms.active {
-      display: grid;
-    }
-
-    .upi-platform-btn {
-      border: 2px solid #d9deef;
-      background: #fff;
-      border-radius: 12px;
-      padding: 14px 12px;
-      font-weight: 700;
-      color: #444;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    .upi-platform-btn:hover {
-      border-color: #667eea;
-      transform: translateY(-1px);
-    }
-
-    .upi-platform-btn.selected {
-      border-color: #667eea;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.08));
-      box-shadow: 0 8px 18px rgba(102, 126, 234, 0.12);
-    }
-
 
     .action-buttons {
       display: flex;
@@ -938,9 +905,6 @@
               <input type="radio" name="paymentMethod" value="upi" onchange="handlePaymentMethodChange('upi')">
               <span>Online / UPI</span>
             </label>
-          </div>
-          <div class="upi-platforms" id="upiPlatforms">
-            <button type="button" class="upi-platform-btn" id="upiPlatformChooser" onclick="openInstalledUpiApps()">Open UPI Apps</button>
           </div>
           <div class="payment-help" id="paymentHelp">Choose one option before placing the order.</div>
         </div>
@@ -1627,12 +1591,7 @@
         return `upi://pay?pa=${encodeURIComponent(UPI_PAYEE_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${amount}&cu=INR&tn=${note}`;
     }
 
-    function updateUpiPlatformUI() {
-        const platformBox = document.getElementById('upiPlatforms');
-        if (!platformBox) return;
-
-        platformBox.classList.toggle('active', selectedPaymentMethod === 'upi');
-    }
+    function updateUpiPlatformUI() {}
 
     function openInstalledUpiApps() {
         const validation = validateOrderInputs();
@@ -1836,7 +1795,6 @@
     function updatePaymentSelectionUI() {
         document.getElementById('cashOption').classList.toggle('selected', selectedPaymentMethod === 'cash');
         document.getElementById('upiOption').classList.toggle('selected', selectedPaymentMethod === 'upi');
-        updateUpiPlatformUI();
     }
 
     function resetPaymentSelection() {
@@ -1886,9 +1844,8 @@
             upiPaymentInitiated = false;
         }
 
-        updatePaymentSelectionUI();
-
         if (method === 'cash') {
+            updatePaymentSelectionUI();
             setPaymentHelp('Cash selected. The order will be placed directly.');
             return;
         }
@@ -1905,7 +1862,9 @@
 
         upiPaymentInitiated = false;
         document.getElementById('paymentHelp').dataset.amount = String(validation.finalTotal);
-        setPaymentHelp(`Online payment selected. Open UPI Apps dabaiye for Rs.${validation.finalTotal}.`);
+        updatePaymentSelectionUI();
+        setPaymentHelp(`UPI apps chooser open ho raha hai for Rs.${validation.finalTotal}. Payment ke baad PLACE ORDER dabaiye.`);
+        openInstalledUpiApps();
     }
 
     function resetOrderForm() {
@@ -1992,7 +1951,7 @@
 
           if (upiPaymentInitiated && currentAmount && currentAmount !== nextAmount) {
               upiPaymentInitiated = false;
-              setPaymentHelp('Cart amount changed. Please Open UPI Apps dubara dabaiye.');
+              setPaymentHelp('Cart amount changed. Please Online / UPI option dubara choose kijiye.');
           }
 
           paymentHelp.dataset.amount = nextAmount;
@@ -2028,7 +1987,7 @@
         const orderPayload = buildOrderPayload(validation);
         if (selectedPaymentMethod === 'upi') {
             if (!upiPaymentInitiated) {
-                const message = 'Pehle Open UPI Apps dabaiye, phir payment ke baad PLACE ORDER dabaiye.';
+                const message = 'Pehle Online / UPI option dubara choose kijiye, phir payment ke baad PLACE ORDER dabaiye.';
                 showStatusMessage(message, true);
                 setPaymentHelp(message, true);
                 return;
