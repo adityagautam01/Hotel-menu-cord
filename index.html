@@ -1640,6 +1640,31 @@
         };
     }
 
+    function parseApiResponse(response, fallbackMessage) {
+        return response.text().then(text => {
+            let data = null;
+
+            try {
+                data = text ? JSON.parse(text) : null;
+            } catch (error) {
+                data = null;
+            }
+
+            if (!response.ok) {
+                const message = data && data.message
+                    ? data.message
+                    : `${fallbackMessage} Server ne HTML/error page return kiya. Backend deploy ya API route check karein.`;
+                throw new Error(message);
+            }
+
+            if (!data) {
+                throw new Error(`${fallbackMessage} Server se valid JSON response nahi mila.`);
+            }
+
+            return data;
+        });
+    }
+
     function placeCashOrder(orderPayload) {
         return fetch(ORDERS_API_URL, {
             method: 'POST',
@@ -1647,12 +1672,7 @@
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(orderPayload),
-        }).then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.message || 'Server error while placing order.'); });
-            }
-            return response.json();
-        });
+        }).then(response => parseApiResponse(response, 'Server error while placing order.'));
     }
 
     function completeSuccessfulOrder(data) {
@@ -1686,10 +1706,7 @@
                     }),
                 })
                 .then(verifyResponse => {
-                    if (!verifyResponse.ok) {
-                        return verifyResponse.json().then(err => { throw new Error(err.message || 'Payment verification failed.'); });
-                    }
-                    return verifyResponse.json();
+                    return parseApiResponse(verifyResponse, 'Payment verification failed.');
                 })
                 .then(data => {
                     completeSuccessfulOrder(data);
@@ -1746,12 +1763,7 @@
                 type: orderPayload.type
             }),
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.message || 'Unable to start Razorpay payment.'); });
-            }
-            return response.json();
-        })
+        .then(response => parseApiResponse(response, 'Unable to start Razorpay payment.'))
         .then(data => {
             launchRazorpayCheckout(data, orderPayload);
         })
