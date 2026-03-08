@@ -435,6 +435,39 @@
       min-height: 20px;
     }
 
+    .upi-platforms {
+      display: none;
+      margin-top: 12px;
+      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .upi-platforms.active {
+      display: grid;
+    }
+
+    .upi-platform-btn {
+      border: 2px solid #d9deef;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px 10px;
+      font-weight: 700;
+      color: #444;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .upi-platform-btn:hover {
+      border-color: #667eea;
+      transform: translateY(-1px);
+    }
+
+    .upi-platform-btn.selected {
+      border-color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.08));
+      box-shadow: 0 8px 18px rgba(102, 126, 234, 0.12);
+    }
+
 
     .action-buttons {
       display: flex;
@@ -814,6 +847,10 @@
         grid-template-columns: 1fr;
       }
 
+      .upi-platforms {
+        grid-template-columns: 1fr;
+      }
+
     }
   </style>
 </head>
@@ -903,8 +940,13 @@
             </label>
             <label class="payment-option" id="upiOption">
               <input type="radio" name="paymentMethod" value="upi" onchange="handlePaymentMethodChange('upi')">
-              <span>Online / Razorpay</span>
+              <span>Online / UPI</span>
             </label>
+          </div>
+          <div class="upi-platforms" id="upiPlatforms">
+            <button type="button" class="upi-platform-btn" id="phonepePlatform" onclick="selectUpiPlatform('phonepe')">PhonePe</button>
+            <button type="button" class="upi-platform-btn" id="paytmPlatform" onclick="selectUpiPlatform('paytm')">Paytm</button>
+            <button type="button" class="upi-platform-btn" id="gpayPlatform" onclick="selectUpiPlatform('gpay')">Google Pay</button>
           </div>
           <div class="payment-help" id="paymentHelp">Choose one option before placing the order.</div>
         </div>
@@ -1252,11 +1294,17 @@
     const UPI_PAYEE_ID = '6394949526@upi';
     const UPI_PAYEE_NAME = 'MR.T Cafe';
     const MENU_REFRESH_INTERVAL = 5000;
+    const UPI_PLATFORM_APPS = {
+        phonepe: { label: 'PhonePe', packageName: 'com.phonepe.app' },
+        paytm: { label: 'Paytm', packageName: 'net.one97.paytm' },
+        gpay: { label: 'Google Pay', packageName: 'com.google.android.apps.nbu.paisa.user' }
+    };
     
     // Global variable for AudioContext
     let audioContext;
     let audioReady = false;
     let selectedPaymentMethod = '';
+    let selectedUpiPlatform = '';
     let upiPaymentInitiated = false;
     let menuRefreshStarted = false;
     
@@ -1591,6 +1639,70 @@
         return `upi://pay?pa=${encodeURIComponent(UPI_PAYEE_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${amount}&cu=INR&tn=${note}`;
     }
 
+    function getSelectedUpiPlatformLabel() {
+        return UPI_PLATFORM_APPS[selectedUpiPlatform]?.label || 'UPI';
+    }
+
+    function buildUpiIntentUrl(amount, platformKey) {
+        const platform = UPI_PLATFORM_APPS[platformKey];
+        if (!platform) {
+            return buildUpiUrl(amount);
+        }
+
+        const query = `pa=${encodeURIComponent(UPI_PAYEE_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent('MR.T Cafe Order Payment')}`;
+        return `intent://pay?${query}#Intent;scheme=upi;package=${platform.packageName};end`;
+    }
+
+    function updateUpiPlatformUI() {
+        const platformBox = document.getElementById('upiPlatforms');
+        if (!platformBox) return;
+
+        platformBox.classList.toggle('active', selectedPaymentMethod === 'upi');
+
+        Object.keys(UPI_PLATFORM_APPS).forEach(key => {
+            const button = document.getElementById(`${key}Platform`);
+            if (button) {
+                button.classList.toggle('selected', selectedUpiPlatform === key);
+            }
+        });
+    }
+
+    function openSelectedUpiPlatform(amount) {
+        const genericUpiUrl = buildUpiUrl(amount);
+        const intentUrl = buildUpiIntentUrl(amount, selectedUpiPlatform);
+
+        if (!selectedUpiPlatform) {
+            return;
+        }
+
+        const fallbackTimer = setTimeout(() => {
+            window.location.href = genericUpiUrl;
+        }, 900);
+
+        window.addEventListener('blur', () => clearTimeout(fallbackTimer), { once: true });
+        window.location.href = intentUrl;
+    }
+
+    function selectUpiPlatform(platformKey) {
+        if (!UPI_PLATFORM_APPS[platformKey]) {
+            return;
+        }
+
+        const validation = validateOrderInputs();
+        if (validation.error) {
+            showStatusMessage(validation.error, true);
+            setPaymentHelp(validation.error, true);
+            return;
+        }
+
+        selectedUpiPlatform = platformKey;
+        upiPaymentInitiated = true;
+        updateUpiPlatformUI();
+        document.getElementById('paymentHelp').dataset.amount = String(validation.finalTotal);
+        setPaymentHelp(`${getSelectedUpiPlatformLabel()} open ho raha hai for Rs.${validation.finalTotal}. Payment ke baad PLACE ORDER dabaiye.`);
+        openSelectedUpiPlatform(validation.finalTotal);
+    }
+
     function buildOrderPayload(validation, paymentOverrides = {}) {
         const { hotelName, tableNumber, contactNumber, isDeliveryOrder } = validation;
 
@@ -1614,6 +1726,7 @@
         }
 
         const paymentLabel = paymentOverrides.paymentMethod || (selectedPaymentMethod === 'upi' ? 'Online' : 'Cash');
+        const paymentStatus = paymentOverrides.paymentStatus || (paymentLabel === 'Online' ? `Paid via ${getSelectedUpiPlatformLabel()}` : 'Cash on Delivery/Counter');
 
         orderItems.push({
             name: `Payment Mode: ${paymentLabel}`,
@@ -1632,7 +1745,8 @@
             paymentMethod: paymentLabel,
             paymentType: paymentLabel,
             paymentMode: paymentLabel,
-            paymentStatus: paymentOverrides.paymentStatus || (paymentLabel === 'Online' ? 'Paid via Razorpay' : 'Cash on Delivery/Counter'),
+            paymentStatus: paymentStatus,
+            paymentApp: paymentLabel === 'Online' ? getSelectedUpiPlatformLabel() : '',
             confirmed: paymentOverrides.confirmed ?? (paymentLabel === 'Online'),
             date: new Date().toLocaleDateString('en-GB'),
             time: new Date().toLocaleTimeString(),
@@ -1776,10 +1890,12 @@
     function updatePaymentSelectionUI() {
         document.getElementById('cashOption').classList.toggle('selected', selectedPaymentMethod === 'cash');
         document.getElementById('upiOption').classList.toggle('selected', selectedPaymentMethod === 'upi');
+        updateUpiPlatformUI();
     }
 
     function resetPaymentSelection() {
         selectedPaymentMethod = '';
+        selectedUpiPlatform = '';
         upiPaymentInitiated = false;
         document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
             input.checked = false;
@@ -1822,6 +1938,7 @@
     function handlePaymentMethodChange(method) {
         selectedPaymentMethod = method;
         if (method !== 'upi') {
+            selectedUpiPlatform = '';
             upiPaymentInitiated = false;
         }
 
@@ -1842,9 +1959,9 @@
             return;
         }
 
-        upiPaymentInitiated = true;
+        upiPaymentInitiated = false;
         document.getElementById('paymentHelp').dataset.amount = String(validation.finalTotal);
-        setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi Razorpay checkout open hoga for Rs.${validation.finalTotal}.`);
+        setPaymentHelp(`Online payment selected. Ab PhonePe, Paytm ya Google Pay choose kijiye for Rs.${validation.finalTotal}.`);
     }
 
     function resetOrderForm() {
@@ -1926,8 +2043,15 @@
 
       if (selectedPaymentMethod === 'upi') {
           const paymentHelp = document.getElementById('paymentHelp');
-          paymentHelp.dataset.amount = String(finalTotal);
-          setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi Razorpay checkout open hoga for Rs.${finalTotal}.`);
+          const nextAmount = String(finalTotal);
+          const currentAmount = paymentHelp.dataset.amount || '';
+
+          if (selectedUpiPlatform && currentAmount && currentAmount !== nextAmount) {
+              upiPaymentInitiated = false;
+              setPaymentHelp('Cart amount changed. Please apna UPI platform dubara choose kijiye.');
+          }
+
+          paymentHelp.dataset.amount = nextAmount;
       }
     }
 
@@ -1959,8 +2083,28 @@
 
         const orderPayload = buildOrderPayload(validation);
         if (selectedPaymentMethod === 'upi') {
-            upiPaymentInitiated = true;
-            startRazorpayPayment(orderPayload);
+            if (!selectedUpiPlatform) {
+                const message = 'PhonePe, Paytm ya Google Pay me se ek UPI platform choose kijiye.';
+                showStatusMessage(message, true);
+                setPaymentHelp(message, true);
+                return;
+            }
+
+            if (!upiPaymentInitiated) {
+                const message = 'Pehle apna UPI platform dubara choose kijiye, phir payment ke baad PLACE ORDER dabaiye.';
+                showStatusMessage(message, true);
+                setPaymentHelp(message, true);
+                return;
+            }
+
+            placeCashOrder(orderPayload)
+            .then(data => {
+                completeSuccessfulOrder(data);
+            })
+            .catch(error => {
+                console.error('Order Error:', error);
+                showStatusMessage('Order failed: ' + error.message, true);
+            });
             return;
         }
 
