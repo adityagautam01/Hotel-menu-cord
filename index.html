@@ -1813,6 +1813,7 @@
         }
 
         upiPaymentInitiated = true;
+        document.getElementById('paymentHelp').dataset.amount = String(validation.finalTotal);
         setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi Razorpay checkout open hoga for Rs.${validation.finalTotal}.`);
     }
 
@@ -1893,9 +1894,10 @@
 
       cartTotalDiv.textContent = `Grand Total: Rs.${finalTotal}`;
 
-      if (selectedPaymentMethod === 'upi' && upiPaymentInitiated) {
-          upiPaymentInitiated = false;
-          setPaymentHelp('Cart amount changed. Online payment amount update ho gaya hai, please Online / Razorpay option dubara select karein.');
+      if (selectedPaymentMethod === 'upi') {
+          const paymentHelp = document.getElementById('paymentHelp');
+          paymentHelp.dataset.amount = String(finalTotal);
+          setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi Razorpay checkout open hoga for Rs.${finalTotal}.`);
       }
     }
 
@@ -1925,15 +1927,9 @@
             return;
         }
 
-        if (selectedPaymentMethod === 'upi' && !upiPaymentInitiated) {
-            const message = 'Pehle Online / Razorpay option choose kijiye, phir PLACE ORDER dabaiye.';
-            showStatusMessage(message, true);
-            setPaymentHelp(message, true);
-            return;
-        }
-
         const orderPayload = buildOrderPayload(validation);
         if (selectedPaymentMethod === 'upi') {
+            upiPaymentInitiated = true;
             startRazorpayPayment(orderPayload);
             return;
         }
