@@ -903,7 +903,7 @@
             </label>
             <label class="payment-option" id="upiOption">
               <input type="radio" name="paymentMethod" value="upi" onchange="handlePaymentMethodChange('upi')">
-              <span>Online / UPI</span>
+              <span>Online / Razorpay</span>
             </label>
           </div>
           <div class="payment-help" id="paymentHelp">Choose one option before placing the order.</div>
@@ -1239,6 +1239,7 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   
   <script>
    let cart = {};
@@ -1246,6 +1247,8 @@
     const DELIVERY_CHARGE = 10; // UPDATED: Delivery charge changed from 20 to 10
     const MENU_API_URL = 'https://mrt-cafe-api.onrender.com/api/menu'; // Menu API Endpoint
     const ORDERS_API_URL = 'https://mrt-cafe-api.onrender.com/api/orders';
+    const RAZORPAY_ORDER_API_URL = 'https://mrt-cafe-api.onrender.com/api/payments/razorpay/order';
+    const RAZORPAY_VERIFY_API_URL = 'https://mrt-cafe-api.onrender.com/api/payments/razorpay/verify';
     const UPI_PAYEE_ID = '6394949526@upi';
     const UPI_PAYEE_NAME = 'MR.T Cafe';
     const MENU_REFRESH_INTERVAL = 5000;
@@ -1588,6 +1591,158 @@
         return `upi://pay?pa=${encodeURIComponent(UPI_PAYEE_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${amount}&cu=INR&tn=${note}`;
     }
 
+    function buildOrderPayload(validation, paymentOverrides = {}) {
+        const { hotelName, tableNumber, contactNumber, isDeliveryOrder } = validation;
+
+        const orderItems = Object.keys(cart).map(item => ({
+            name: item,
+            quantity: cart[item].quantity,
+            price: cart[item].price,
+            total: cart[item].price * cart[item].quantity
+        }));
+
+        let orderTotal = orderItems.reduce((sum, item) => sum + item.total, 0);
+
+        if (isDeliveryOrder) {
+            orderTotal += DELIVERY_CHARGE;
+            orderItems.push({
+                name: 'Delivery Charge',
+                quantity: 1,
+                price: DELIVERY_CHARGE,
+                total: DELIVERY_CHARGE
+            });
+        }
+
+        const paymentLabel = paymentOverrides.paymentMethod || (selectedPaymentMethod === 'upi' ? 'Online' : 'Cash');
+
+        orderItems.push({
+            name: `Payment Mode: ${paymentLabel}`,
+            quantity: 1,
+            price: orderTotal,
+            total: orderTotal
+        });
+
+        return {
+            customerName: hotelName,
+            tableNumber: tableNumber,
+            contactNumber: isDeliveryOrder ? contactNumber : 'N/A',
+            items: orderItems,
+            total: orderTotal,
+            type: isDeliveryOrder ? 'Delivery' : 'Dine-In',
+            paymentMethod: paymentLabel,
+            paymentType: paymentLabel,
+            paymentMode: paymentLabel,
+            paymentStatus: paymentOverrides.paymentStatus || (paymentLabel === 'Online' ? 'Paid via Razorpay' : 'Cash on Delivery/Counter'),
+            confirmed: paymentOverrides.confirmed ?? (paymentLabel === 'Online'),
+            date: new Date().toLocaleDateString('en-GB'),
+            time: new Date().toLocaleTimeString(),
+            timestamp: Date.now()
+        };
+    }
+
+    function placeCashOrder(orderPayload) {
+        return fetch(ORDERS_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderPayload),
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Server error while placing order.'); });
+            }
+            return response.json();
+        });
+    }
+
+    function completeSuccessfulOrder(data) {
+        showStatusMessage('Order Placed Successfully! (Order ID: ' + data.orderNumber + ')');
+        resetOrderForm();
+        toggleCart();
+    }
+
+    function launchRazorpayCheckout(razorpayConfig, orderPayload) {
+        if (!window.Razorpay) {
+            showStatusMessage('Razorpay checkout load nahi hua. Please try again.', true);
+            return;
+        }
+
+        const options = {
+            key: razorpayConfig.keyId,
+            amount: razorpayConfig.order.amount,
+            currency: razorpayConfig.order.currency,
+            name: UPI_PAYEE_NAME,
+            description: 'MR.T Cafe Order Payment',
+            order_id: razorpayConfig.order.id,
+            handler: function (response) {
+                fetch(RAZORPAY_VERIFY_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...response,
+                        orderData: orderPayload
+                    }),
+                })
+                .then(verifyResponse => {
+                    if (!verifyResponse.ok) {
+                        return verifyResponse.json().then(err => { throw new Error(err.message || 'Payment verification failed.'); });
+                    }
+                    return verifyResponse.json();
+                })
+                .then(data => {
+                    completeSuccessfulOrder(data);
+                })
+                .catch(error => {
+                    console.error('Razorpay verify error:', error);
+                    showStatusMessage('Payment verify nahi ho paya: ' + error.message, true);
+                });
+            },
+            prefill: {
+                contact: orderPayload.contactNumber !== 'N/A' ? orderPayload.contactNumber : ''
+            },
+            theme: {
+                color: '#667eea'
+            },
+            modal: {
+                ondismiss: function () {
+                    showStatusMessage('Payment window close ho gayi. Order place nahi hua.', true);
+                }
+            }
+        };
+
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+    }
+
+    function startRazorpayPayment(orderPayload) {
+        fetch(RAZORPAY_ORDER_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                amount: orderPayload.total,
+                customerName: orderPayload.customerName,
+                type: orderPayload.type
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Unable to start Razorpay payment.'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            launchRazorpayCheckout(data, orderPayload);
+        })
+        .catch(error => {
+            console.error('Razorpay start error:', error);
+            showStatusMessage('Online payment start nahi ho paya: ' + error.message, true);
+        });
+    }
+
     function updatePaymentSelectionUI() {
         document.getElementById('cashOption').classList.toggle('selected', selectedPaymentMethod === 'cash');
         document.getElementById('upiOption').classList.toggle('selected', selectedPaymentMethod === 'upi');
@@ -1634,29 +1789,6 @@
         };
     }
 
-    function openUpiPayment(amount) {
-        if (!UPI_PAYEE_ID || UPI_PAYEE_ID === 'your-upi-id@upi') {
-            const message = 'UPI ID abhi set nahi hai. Pehle code me asli UPI ID daalni padegi.';
-            upiPaymentInitiated = false;
-            setPaymentHelp(message, true);
-            showStatusMessage(message, true);
-            return;
-        }
-
-        upiPaymentInitiated = true;
-        const upiUrl = buildUpiUrl(amount);
-        const intentUrl = `intent://pay?pa=${encodeURIComponent(UPI_PAYEE_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent('MR.T Cafe Order Payment')}#Intent;scheme=upi;end`;
-
-        setPaymentHelp(`UPI app open ho sakti hai. Agar na khule to QR scan ya copied UPI ID se payment karein.`);
-        window.location.href = upiUrl;
-
-        setTimeout(() => {
-            if (document.visibilityState === 'visible') {
-                window.location.href = intentUrl;
-            }
-        }, 700);
-    }
-
     function handlePaymentMethodChange(method) {
         selectedPaymentMethod = method;
         if (method !== 'upi') {
@@ -1680,7 +1812,8 @@
             return;
         }
 
-        openUpiPayment(validation.finalTotal);
+        upiPaymentInitiated = true;
+        setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi Razorpay checkout open hoga for Rs.${validation.finalTotal}.`);
     }
 
     function resetOrderForm() {
@@ -1762,7 +1895,7 @@
 
       if (selectedPaymentMethod === 'upi' && upiPaymentInitiated) {
           upiPaymentInitiated = false;
-          setPaymentHelp('Cart amount changed. UPI amount update ho gaya hai, please UPI option dubara select karein.');
+          setPaymentHelp('Cart amount changed. Online payment amount update ho gaya hai, please Online / Razorpay option dubara select karein.');
       }
     }
 
@@ -1791,6 +1924,29 @@
             showStatusMessage(validation.error, true);
             return;
         }
+
+        if (selectedPaymentMethod === 'upi' && !upiPaymentInitiated) {
+            const message = 'Pehle Online / Razorpay option choose kijiye, phir PLACE ORDER dabaiye.';
+            showStatusMessage(message, true);
+            setPaymentHelp(message, true);
+            return;
+        }
+
+        const orderPayload = buildOrderPayload(validation);
+        if (selectedPaymentMethod === 'upi') {
+            startRazorpayPayment(orderPayload);
+            return;
+        }
+
+        placeCashOrder(orderPayload)
+        .then(data => {
+            completeSuccessfulOrder(data);
+        })
+        .catch(error => {
+            console.error('Order Error:', error);
+            showStatusMessage('Order failed: ' + error.message, true);
+        });
+        return;
 
         const { hotelName, tableNumber, contactNumber, isDeliveryOrder } = validation;
 
