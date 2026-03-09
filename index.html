@@ -903,7 +903,7 @@
             </label>
             <label class="payment-option" id="upiOption">
               <input type="radio" name="paymentMethod" value="upi" onchange="handlePaymentMethodChange('upi')">
-              <span>Online / UPI</span>
+              <span>Online / Razorpay</span>
             </label>
           </div>
           <div class="payment-help" id="paymentHelp">Choose one option before placing the order.</div>
@@ -1239,12 +1239,15 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
    let cart = {};
     let total = 0;
     const DELIVERY_CHARGE = 10; // UPDATED: Delivery charge changed from 20 to 10
     const MENU_API_URL = 'https://mrt-cafe-api.onrender.com/api/menu'; // Menu API Endpoint
     const ORDERS_API_URL = 'https://mrt-cafe-api.onrender.com/api/orders';
+    const RAZORPAY_ORDER_API_URL = 'https://mrt-cafe-api.onrender.com/api/payments/razorpay/order';
+    const RAZORPAY_VERIFY_API_URL = 'https://mrt-cafe-api.onrender.com/api/payments/razorpay/verify';
     const UPI_PAYEE_ID = 'Q106322842@ybl';
     const UPI_PAYEE_NAME = 'MR.T Cafe';
     const MENU_REFRESH_INTERVAL = 5000;
@@ -1624,7 +1627,7 @@
         }
 
         const paymentLabel = paymentOverrides.paymentMethod || (selectedPaymentMethod === 'upi' ? 'Online' : 'Cash');
-        const paymentStatus = paymentOverrides.paymentStatus || (paymentLabel === 'Online' ? 'Paid via UPI' : 'Cash on Delivery/Counter');
+        const paymentStatus = paymentOverrides.paymentStatus || (paymentLabel === 'Online' ? 'Paid via Razorpay' : 'Cash on Delivery/Counter');
 
         orderItems.push({
             name: `Payment Mode: ${paymentLabel}`,
@@ -1644,12 +1647,37 @@
             paymentType: paymentLabel,
             paymentMode: paymentLabel,
             paymentStatus: paymentStatus,
-            paymentApp: paymentLabel === 'Online' ? 'UPI' : '',
+            paymentApp: paymentLabel === 'Online' ? 'Razorpay' : '',
             confirmed: paymentOverrides.confirmed ?? (paymentLabel === 'Online'),
             date: new Date().toLocaleDateString('en-GB'),
             time: new Date().toLocaleTimeString(),
             timestamp: Date.now()
         };
+    }
+
+    function parseApiResponse(response, fallbackMessage) {
+        return response.text().then(text => {
+            let data = null;
+
+            try {
+                data = text ? JSON.parse(text) : null;
+            } catch (error) {
+                data = null;
+            }
+
+            if (!response.ok) {
+                const message = data && data.message
+                    ? data.message
+                    : `${fallbackMessage} Server ne HTML/error page return kiya. Backend deploy ya API route check karein.`;
+                throw new Error(message);
+            }
+
+            if (!data) {
+                throw new Error(`${fallbackMessage} Server se valid JSON response nahi mila.`);
+            }
+
+            return data;
+        });
     }
 
     function placeCashOrder(orderPayload) {
@@ -1659,18 +1687,85 @@
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(orderPayload),
-        }).then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.message || 'Server error while placing order.'); });
-            }
-            return response.json();
-        });
+        }).then(response => parseApiResponse(response, 'Server error while placing order.'));
     }
 
     function completeSuccessfulOrder(data) {
         showStatusMessage('Order Placed Successfully! (Order ID: ' + data.orderNumber + ')');
         resetOrderForm();
         toggleCart();
+    }
+
+    function launchRazorpayCheckout(razorpayConfig, orderPayload) {
+        if (!window.Razorpay) {
+            showStatusMessage('Razorpay checkout load nahi hua. Please try again.', true);
+            return;
+        }
+
+        const options = {
+            key: razorpayConfig.keyId,
+            amount: razorpayConfig.order.amount,
+            currency: razorpayConfig.order.currency,
+            name: UPI_PAYEE_NAME,
+            description: 'MR.T Cafe Order Payment',
+            order_id: razorpayConfig.order.id,
+            handler: function (response) {
+                fetch(RAZORPAY_VERIFY_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...response,
+                        orderData: orderPayload
+                    }),
+                })
+                .then(verifyResponse => parseApiResponse(verifyResponse, 'Payment verification failed.'))
+                .then(data => {
+                    completeSuccessfulOrder(data);
+                })
+                .catch(error => {
+                    console.error('Razorpay verify error:', error);
+                    showStatusMessage('Payment verify nahi ho paya: ' + error.message, true);
+                });
+            },
+            prefill: {
+                contact: orderPayload.contactNumber !== 'N/A' ? orderPayload.contactNumber : ''
+            },
+            theme: {
+                color: '#667eea'
+            },
+            modal: {
+                ondismiss: function () {
+                    showStatusMessage('Payment window close ho gayi. Order place nahi hua.', true);
+                }
+            }
+        };
+
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+    }
+
+    function startRazorpayPayment(orderPayload) {
+        fetch(RAZORPAY_ORDER_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                amount: orderPayload.total,
+                customerName: orderPayload.customerName,
+                type: orderPayload.type
+            }),
+        })
+        .then(response => parseApiResponse(response, 'Unable to start Razorpay payment.'))
+        .then(data => {
+            launchRazorpayCheckout(data, orderPayload);
+        })
+        .catch(error => {
+            console.error('Razorpay start error:', error);
+            showStatusMessage('Online payment start nahi ho paya: ' + error.message, true);
+        });
     }
 
     function updatePaymentSelectionUI() {
@@ -1741,11 +1836,10 @@
             return;
         }
 
-        upiPaymentInitiated = false;
+        upiPaymentInitiated = true;
         document.getElementById('paymentHelp').dataset.amount = String(validation.finalTotal);
         updatePaymentSelectionUI();
-        setPaymentHelp(`UPI apps chooser open ho raha hai for Rs.${validation.finalTotal}. Payment ke baad PLACE ORDER dabaiye.`);
-        openInstalledUpiApps();
+        setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi Razorpay checkout open hoga for Rs.${validation.finalTotal}.`);
     }
 
     function resetOrderForm() {
@@ -1832,7 +1926,7 @@
 
           if (upiPaymentInitiated && currentAmount && currentAmount !== nextAmount) {
               upiPaymentInitiated = false;
-              setPaymentHelp('Cart amount changed. Please Online / UPI option dubara choose kijiye.');
+              setPaymentHelp('Cart amount changed. Online payment amount update ho gaya hai, please Online / Razorpay option dubara select karein.');
           }
 
           paymentHelp.dataset.amount = nextAmount;
@@ -1868,20 +1962,13 @@
         const orderPayload = buildOrderPayload(validation);
         if (selectedPaymentMethod === 'upi') {
             if (!upiPaymentInitiated) {
-                const message = 'Pehle Online / UPI option dubara choose kijiye, phir payment ke baad PLACE ORDER dabaiye.';
+                const message = 'Pehle Online / Razorpay option choose kijiye, phir PLACE ORDER dabaiye.';
                 showStatusMessage(message, true);
                 setPaymentHelp(message, true);
                 return;
             }
 
-            placeCashOrder(orderPayload)
-            .then(data => {
-                completeSuccessfulOrder(data);
-            })
-            .catch(error => {
-                console.error('Order Error:', error);
-                showStatusMessage('Order failed: ' + error.message, true);
-            });
+            startRazorpayPayment(orderPayload);
             return;
         }
 
