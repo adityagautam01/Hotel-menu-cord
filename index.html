@@ -1239,16 +1239,12 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  
   <script>
    let cart = {};
     let total = 0;
     const DELIVERY_CHARGE = 10; // UPDATED: Delivery charge changed from 20 to 10
     const MENU_API_URL = 'https://mrt-cafe-api.onrender.com/api/menu'; // Menu API Endpoint
     const ORDERS_API_URL = 'https://mrt-cafe-api.onrender.com/api/orders';
-    const RAZORPAY_ORDER_API_URL = 'https://mrt-cafe-api.onrender.com/api/payments/razorpay/order';
-    const RAZORPAY_VERIFY_API_URL = 'https://mrt-cafe-api.onrender.com/api/payments/razorpay/verify';
     const UPI_PAYEE_ID = 'Q106322842@ybl';
     const UPI_PAYEE_NAME = 'MR.T Cafe';
     const MENU_REFRESH_INTERVAL = 5000;
@@ -1591,8 +1587,6 @@
         return `upi://pay?pa=${encodeURIComponent(UPI_PAYEE_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${amount}&cu=INR&tn=${note}`;
     }
 
-    function updateUpiPlatformUI() {}
-
     function openInstalledUpiApps() {
         const validation = validateOrderInputs();
         if (validation.error) {
@@ -1602,7 +1596,6 @@
         }
 
         upiPaymentInitiated = true;
-        updateUpiPlatformUI();
         document.getElementById('paymentHelp').dataset.amount = String(validation.finalTotal);
         setPaymentHelp(`UPI apps chooser open ho raha hai for Rs.${validation.finalTotal}. Payment ke baad PLACE ORDER dabaiye.`);
         window.location.href = buildUpiUrl(validation.finalTotal);
@@ -1659,31 +1652,6 @@
         };
     }
 
-    function parseApiResponse(response, fallbackMessage) {
-        return response.text().then(text => {
-            let data = null;
-
-            try {
-                data = text ? JSON.parse(text) : null;
-            } catch (error) {
-                data = null;
-            }
-
-            if (!response.ok) {
-                const message = data && data.message
-                    ? data.message
-                    : `${fallbackMessage} Server ne HTML/error page return kiya. Backend deploy ya API route check karein.`;
-                throw new Error(message);
-            }
-
-            if (!data) {
-                throw new Error(`${fallbackMessage} Server se valid JSON response nahi mila.`);
-            }
-
-            return data;
-        });
-    }
-
     function placeCashOrder(orderPayload) {
         return fetch(ORDERS_API_URL, {
             method: 'POST',
@@ -1691,105 +1659,18 @@
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(orderPayload),
-        }).then(response => parseApiResponse(response, 'Server error while placing order.'));
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Server error while placing order.'); });
+            }
+            return response.json();
+        });
     }
 
     function completeSuccessfulOrder(data) {
         showStatusMessage('Order Placed Successfully! (Order ID: ' + data.orderNumber + ')');
         resetOrderForm();
         toggleCart();
-    }
-
-    function launchRazorpayCheckout(razorpayConfig, orderPayload) {
-        if (!window.Razorpay) {
-            showStatusMessage('Razorpay checkout load nahi hua. Please try again.', true);
-            return;
-        }
-
-        const options = {
-            key: razorpayConfig.keyId,
-            amount: razorpayConfig.order.amount,
-            currency: razorpayConfig.order.currency,
-            name: UPI_PAYEE_NAME,
-            description: 'MR.T Cafe Order Payment',
-            order_id: razorpayConfig.order.id,
-            handler: function (response) {
-                fetch(RAZORPAY_VERIFY_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        ...response,
-                        orderData: orderPayload
-                    }),
-                })
-                .then(verifyResponse => {
-                    return parseApiResponse(verifyResponse, 'Payment verification failed.');
-                })
-                .then(data => {
-                    completeSuccessfulOrder(data);
-                })
-                .catch(error => {
-                    console.error('Razorpay verify error:', error);
-                    showStatusMessage('Payment verify nahi ho paya: ' + error.message, true);
-                });
-            },
-            prefill: {
-                contact: orderPayload.contactNumber !== 'N/A' ? orderPayload.contactNumber : ''
-            },
-            config: {
-                display: {
-                    blocks: {
-                        upi: {
-                            name: 'Pay by UPI',
-                            instruments: [
-                                {
-                                    method: 'upi'
-                                }
-                            ]
-                        }
-                    },
-                    sequence: ['block.upi'],
-                    preferences: {
-                        show_default_blocks: false
-                    }
-                }
-            },
-            theme: {
-                color: '#667eea'
-            },
-            modal: {
-                ondismiss: function () {
-                    showStatusMessage('Payment window close ho gayi. Order place nahi hua.', true);
-                }
-            }
-        };
-
-        const razorpay = new window.Razorpay(options);
-        razorpay.open();
-    }
-
-    function startRazorpayPayment(orderPayload) {
-        fetch(RAZORPAY_ORDER_API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                amount: orderPayload.total,
-                customerName: orderPayload.customerName,
-                type: orderPayload.type
-            }),
-        })
-        .then(response => parseApiResponse(response, 'Unable to start Razorpay payment.'))
-        .then(data => {
-            launchRazorpayCheckout(data, orderPayload);
-        })
-        .catch(error => {
-            console.error('Razorpay start error:', error);
-            showStatusMessage('Online payment start nahi ho paya: ' + error.message, true);
-        });
     }
 
     function updatePaymentSelectionUI() {
