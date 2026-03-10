@@ -1710,7 +1710,7 @@
             description: 'MR.T Cafe Order Payment',
             order_id: razorpayConfig.order.id,
             method: { upi: true, card: false, netbanking: false, wallet: false },
-            upi: { flow: 'intent' },
+            upi: { flow: 'intent' }, // force native UPI apps chooser
             handler: function (response) {
                 fetch(RAZORPAY_VERIFY_API_URL, {
                     method: 'POST',
@@ -1733,6 +1733,22 @@
             },
             prefill: {
                 contact: orderPayload.contactNumber !== 'N/A' ? orderPayload.contactNumber : ''
+            },
+            config: {
+                display: {
+                    blocks: {
+                        upi: {
+                            name: 'Pay by UPI',
+                            instruments: [
+                                { method: 'upi' }
+                            ]
+                        }
+                    },
+                    sequence: ['block.upi'],
+                    preferences: {
+                        show_default_blocks: false
+                    }
+                }
             },
             theme: {
                 color: '#667eea'
@@ -1766,13 +1782,7 @@
         })
         .catch(error => {
             console.error('Razorpay start error:', error);
-            showStatusMessage('Online payment start nahi ho paya: ' + error.message + '. UPI chooser try kar rahe hain.', true);
-            // Fallback: open native UPI chooser so customer can still pay
-            try {
-                openInstalledUpiApps();
-            } catch (fallbackErr) {
-                console.error('UPI fallback error:', fallbackErr);
-            }
+            showStatusMessage('Online payment start nahi ho paya: ' + error.message, true);
         });
     }
 
@@ -1847,7 +1857,7 @@
         upiPaymentInitiated = true;
         document.getElementById('paymentHelp').dataset.amount = String(validation.finalTotal);
         updatePaymentSelectionUI();
-        setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi UPI app chooser open hoga for Rs.${validation.finalTotal}.`);
+        setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi Razorpay checkout open hoga for Rs.${validation.finalTotal}.`);
     }
 
     function resetOrderForm() {
