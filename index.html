@@ -1709,6 +1709,8 @@
             name: UPI_PAYEE_NAME,
             description: 'MR.T Cafe Order Payment',
             order_id: razorpayConfig.order.id,
+            method: { upi: true, card: false, netbanking: false, wallet: false },
+            upi: { flow: 'intent' },
             handler: function (response) {
                 fetch(RAZORPAY_VERIFY_API_URL, {
                     method: 'POST',
@@ -1839,7 +1841,7 @@
         upiPaymentInitiated = true;
         document.getElementById('paymentHelp').dataset.amount = String(validation.finalTotal);
         updatePaymentSelectionUI();
-        setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi Razorpay checkout open hoga for Rs.${validation.finalTotal}.`);
+        setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi UPI app chooser open hoga for Rs.${validation.finalTotal}.`);
     }
 
     function resetOrderForm() {
@@ -1926,7 +1928,7 @@
 
           if (upiPaymentInitiated && currentAmount && currentAmount !== nextAmount) {
               upiPaymentInitiated = false;
-              setPaymentHelp('Cart amount changed. Online payment amount update ho gaya hai, please Online / Razorpay option dubara select karein.');
+              setPaymentHelp('Cart amount changed. Online / Razorpay option dubara select karein.');
           }
 
           paymentHelp.dataset.amount = nextAmount;
