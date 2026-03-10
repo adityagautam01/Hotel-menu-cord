@@ -1766,7 +1766,13 @@
         })
         .catch(error => {
             console.error('Razorpay start error:', error);
-            showStatusMessage('Online payment start nahi ho paya: ' + error.message, true);
+            showStatusMessage('Online payment start nahi ho paya: ' + error.message + '. UPI chooser try kar rahe hain.', true);
+            // Fallback: open native UPI chooser so customer can still pay
+            try {
+                openInstalledUpiApps();
+            } catch (fallbackErr) {
+                console.error('UPI fallback error:', fallbackErr);
+            }
         });
     }
 
