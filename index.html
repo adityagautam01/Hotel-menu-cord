@@ -1854,10 +1854,12 @@
             return;
         }
 
-        upiPaymentInitiated = true;
         document.getElementById('paymentHelp').dataset.amount = String(validation.finalTotal);
+        upiPaymentInitiated = true;
         updatePaymentSelectionUI();
-        setPaymentHelp(`Online payment selected. PLACE ORDER dabate hi Razorpay checkout open hoga for Rs.${validation.finalTotal}.`);
+        setPaymentHelp(`Online payment selected. UPI apps chooser open ho raha hai for Rs.${validation.finalTotal}. Payment ke baad PLACE ORDER dabaiye.`);
+        // Open native UPI chooser immediately
+        openInstalledUpiApps();
     }
 
     function resetOrderForm() {
@@ -1980,13 +1982,20 @@
         const orderPayload = buildOrderPayload(validation);
         if (selectedPaymentMethod === 'upi') {
             if (!upiPaymentInitiated) {
-                const message = 'Pehle Online / Razorpay option choose kijiye, phir PLACE ORDER dabaiye.';
+                const message = 'Pehle Online / UPI select karke UPI app chooser open karein, phir PLACE ORDER dabaiye.';
                 showStatusMessage(message, true);
                 setPaymentHelp(message, true);
                 return;
             }
 
-            startRazorpayPayment(orderPayload);
+            placeCashOrder(orderPayload)
+            .then(data => {
+                completeSuccessfulOrder(data);
+            })
+            .catch(error => {
+                console.error('Order Error:', error);
+                showStatusMessage('Order failed: ' + error.message, true);
+            });
             return;
         }
 
@@ -1999,8 +2008,6 @@
             showStatusMessage('Order failed: ' + error.message, true);
         });
         return;
-
-        const { hotelName, tableNumber, contactNumber, isDeliveryOrder } = validation;
 
         if (selectedPaymentMethod === 'upi' && !upiPaymentInitiated) {
             const message = 'Pehle UPI option choose karke payment app open kijiye, phir payment ke baad PLACE ORDER dabaiye.';
